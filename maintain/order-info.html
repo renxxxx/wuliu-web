@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>集贤装-运维-订单信息</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./layer/layer.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+    <style></style>
+</head>
+
+<script>
+var config = null;
+    $.ajax({
+        url:'./config.json',
+        async:false,
+        success:function(res){
+            config=res;
+        }
+    })
+
+    layer.config({offset: '200px'});
+    $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        $('#doingTag').show();
+    });
+    $.ajaxSetup({
+        complete:function(){
+            $('#doingTag').hide();
+        },
+        error:function(xhr){
+            
+        }
+    })
+
+    var qso = util.queryStringObject();
+    qso.keFuPresetQuestionId;
+    var item = {}
+
+    $.ajax({
+        type: 'get',
+        url: config.root+`/maintain/ke-fu-preset-question-manage/ke-fu-preset-question-info?keFuPresetQuestionId=${qso.keFuPresetQuestionId}`,
+        async: false,
+        success: function (res) {
+            debugger
+            if (res.codeMsg)
+                layer.msg(res.codeMsg);
+            if (res.code == 0) {
+                item = res.data;
+            }
+        }
+    })
+
+    $.parser.onComplete = function () {
+        debugger
+    }
+
+    $(document).ready(function(){
+        debugger
+    })
+
+    function paperUpdate(){
+        debugger
+        $.messager.confirm('提示','确认修改吗?',function(r){
+            if(r){
+                $.ajax({
+                        type: 'post',
+                        url: config.root+'/maintain/ke-fu-preset-question-manage/ke-fu-preset-question-update',
+                        data: item,
+                        success: function (res) {
+                            debugger
+                            if (res.codeMsg)
+                                $.messager.alert('提示',res.codeMsg);
+                            if (res.code == 0) {
+                                if (!res.codeMsg)
+                                    $.messager.alert('提示','修改成功',null,function(){ location.reload()});
+                            } 
+                        }
+                    })
+            }
+        })
+    }
+             
+    function paperDelete(){
+        debugger
+        $.messager.confirm('提示','确认删除吗？', function(r){
+            if(r)
+            $.ajax({
+                type: 'post',
+                url: config.root+'/maintain/ke-fu-preset-question-manage/ke-fu-preset-question-list-delete',
+                data: {keFuPresetQuestionId:item.keFuPresetQuestionId,expectCount:1},
+                success: function (res) {
+                    debugger
+                    if (res.codeMsg)
+                        $.messager.alert('提示',res.codeMsg);
+                    if (res.code == 0) {
+                        if (!res.codeMsg)
+                            $.messager.alert('提示','删除成功',null,function(){ location.reload()});
+                    } 
+                }
+            })
+        });             
+    }
+             
+        
+</script>
+
+<body style="margin:0;padding:0;">
+    <img id="doingTag" src="./image/doing.gif" style="width:100%;height:5px;position: absolute;top:0;z-index: 999999;display:none;" />
+    <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'问卷详情'">
+        <thead>
+            <tr>
+                <th data-options="field:'name',width:200,align:'right'">属性&nbsp;</th>
+                <th data-options="field:'value',width:500">值</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>问题Id&nbsp;</td>
+                <td>
+                    <span id="keFuPresetQuestionId" style="margin-left:5px;"></span>
+                    <img src="./favicon.ico" onload="$('#keFuPresetQuestionId').text(item.keFuPresetQuestionId||'')" style="display:none;"/>
+                </td>
+            </tr>
+            <tr>
+                <td>问题&nbsp;</td>
+                <td>
+                    <input id="name" class="easyui-textbox" style="width:100%;height:200px;" 
+                        data-options="
+                            value:item.name,
+                            multiline:true,
+                            onChange:function(newValue, oldValue){
+                                item.name=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>回复&nbsp;</td>
+                <td>
+                    <input id="reply" class="easyui-textbox" style="width:100%;height:200px;" 
+                        data-options="
+                            value:item.reply,
+                            multiline:true,
+                            onChange:function(newValue, oldValue){
+                                item.reply=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>序号&nbsp;</td>
+                <td>
+                    <input id="orderNo" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.orderNo,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.orderNo=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="datagridFoot" style="padding:2px 5px;">
+        <a id="update" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-edit"  plain="true"
+            onclick="$('#update,#remove,#reload,#updatePasswordPageEntrance,#freeze,#unfreeze').hide();$('#updateConfirm,#updateCancel').show()"
+            >修改
+        </a>
+        <a id="updateConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-ok"  plain="true" 
+            onclick="paperUpdate()"
+            >确认
+        </a>
+        <a id="updateCancel" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-cancel"  plain="true" 
+            onclick="location.reload()"
+            >取消
+        </a>
+        <a id="remove" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-remove"  plain="true" 
+            onclick="paperDelete()"
+            >删除
+        </a>
+        <a id="reload" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" 
+            onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})"
+            >刷新
+        </a>
+    </div>
+        
+</body>
+<script>
+    $('#datagrid').datagrid()
+</script>
+</html>

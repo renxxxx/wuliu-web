@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>集贤装-运维-添加文章</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="./favicon.ico" type="image/svg" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script charset="utf-8" src="./tinymce/tinymce.min.js"></script>
+    <script src="./layer/layer.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+</head>
+
+<style>
+    img {
+        object-fit:contain;
+    }
+</style>
+
+<script>
+
+    var qso = util.queryStringObject();
+    var item = {},contentEditor
+
+    
+
+    $.parser.onComplete = function () {
+        debugger
+    }
+
+
+    $(document).ready(function(){
+        debugger
+        contentEditor =  tinymce.init({
+    selector: '#content',
+    plugins : 'advlist autolink link image lists charmap print preview media paste save imagetools template pagebreak hr autosave fullpage fullscreen table textcolor textpattern wordcount insertdatetime legacyoutput pageembed code bdmap',
+    automatic_uploads: false,
+    forced_root_block: 'div',
+    force_p_newlines: false,
+    images_upload_url: 'postAcceptor.php',
+    language: "zh_CN",
+    file_picker_callback:function(callback,value,meta){
+        debugger
+        $(`<input type='file'>`).change(function(){
+            var target = this;
+                                if(this.files.length>0){
+                                    var file = this.files[0];
+                                    var fd = new FormData()
+                                    fd.append('file', file);
+                                    $.ajax({
+                                        url: '/upload-file',
+                                        type: 'POST',
+                                        data: fd,
+                                        cache: false,
+                                        processData: false,
+                                        contentType: false,
+                                        async: true,
+                                        success: function (res) {
+                                            if (res.codeMsg)
+                                                $.messager.alert('提示',res.codeMsg)
+                                            if (res.code == 0) {
+                                                callback(res.data.url)
+                                                target.value=null
+                                                $(target).remove()
+                                            }
+                                        }
+                                    })
+                                }
+        }).click()
+       
+    },
+    images_upload_handler: function (blobInfo, success, failure) {
+        debugger
+        var xhr, formData;
+
+        xhr = new XMLHttpRequest();
+        xhr.withCredentials = false;
+        xhr.open('POST', 'postAcceptor.php');
+
+        xhr.onload = function() {
+            var json;
+            if (xhr.status != 200) {
+                failure('HTTP Error: ' + xhr.status);
+                return;
+            }
+            json = JSON.parse(xhr.responseText);
+            if (!json || typeof json.location != 'string') {
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
+            }
+            success(json.location);
+        };
+        formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.filename());
+        xhr.send(formData);
+    }
+  });
+
+        $("#loading").remove();
+    })
+
+
+function createConfirm(){
+    debugger
+    $.messager.confirm('提示','确认创建吗?',function(r){
+if(r){
+        $.ajax({
+                type: 'post',
+                contentType:"text/plain",
+                url: '/upload-stream?'+$.param({ext:'html'}),
+                async:false,
+                data: tinyMCE.editors[0].getContent() ,
+                success: function (res) {
+                    debugger
+                    if (res.codeMsg)
+                        $.messager.alert('提示',res.codeMsg)
+                    if (res.code == 0) {
+                        item.contentUrl=res.data.url
+                    } 
+                }
+            })
+
+
+        $.ajax({
+                            type: 'post',
+                            url: '/maintain/article-manage/article-insert',
+                            data: item,
+                            success: function (res) {
+                                debugger
+                                if (res.codeMsg)
+                                 $.messager.alert('提示',res.codeMsg)
+                                if (res.code == 0) {
+                                    if (!res.codeMsg)
+                                    $.messager.alert('提示','操作成功',null,function(){
+                                                location.reload()
+                                            })
+                                } 
+                            }
+                        })
+                    }
+    })
+    
+}
+        
+
+
+</script>
+
+<body style="margin:0;padding:0;">
+    <div id="loading" class='' style="position: absolute; z-index: 1000; top: 0px; left: 0px; 
+    width: 100%; height: 100%; background: white; text-align: center;padding:5px 10px">
+        <font>loading···</font>
+    </div>
+
+        <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'创建文章'">
+            <thead>
+                <tr>
+                    <th data-options="field:'name',width:200,align:'right'">属性&nbsp;</th>
+                    <th data-options="field:'value',width:500">值</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>文章标题&nbsp;</td>
+                    <td><input id="title" class="easyui-textbox" style="width:100%" data-options="
+                        value:item.title,
+                        iconWidth:20,
+                        icons:[{
+                            iconCls:'icon-clear',
+                            handler: function(e){
+                                debugger
+                                $(e.data.target).textbox('setValue','');
+                            }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            item.title=newValue
+                        }" style="width:200px"></td>
+                </tr>
+                <tr>
+                    <td>封面&nbsp;</td>
+                    <td>
+                        <div id="coverImage">
+                            <img style="display:none;" src="./favicon.ico" onload="$('#coverImage-value').attr('src',item.coverImage).parent().viewer({url: 'src',});if(item.coverImage) $('#coverImage-value').show();" />
+                            <img id="coverImage-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","./image/image-error.png");' />
+                            <input type="file" style="display:none;" onchange="
+                                javascript:
+                                var target = this;
+                                if(this.files.length>0){
+                                    var file = this.files[0];
+                                    var fd = new FormData()
+                                    fd.append('file', file);
+                                    $.ajax({
+                                        url: '/upload-file' ),
+                                        type: 'POST',
+                                        data: fd,
+                                        cache: false,
+                                        processData: false,
+                                        contentType: false,
+                                        async: true,
+                                        success: function (res) {
+                                            if (res.codeMsg)
+                                                $.messager.alert('提示',res.codeMsg)
+                                            if (res.code == 0) {
+                                                item.coverImage=res.data.url 
+                                                $(target).prev().attr('src',item.coverImage).show()
+                                             target.value=null
+                                            }
+                                        }
+                                    })
+                                }
+                            " />
+                            <a title="删除" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" plain="true"
+                                style="vertical-align: text-bottom;"
+                                onclick="$(this).prev().prev().attr('src',null).hide();item.coverImage='';"></a>
+                            <a title="选择" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-choose" plain="true"
+                                style="vertical-align: text-bottom;" onclick="$(this).prev().prev().click()"></a>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>摘要&nbsp;</td>
+                    <td><input id="summary" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
+                            value:item.summary,
+                            multiline:true,
+                            onChange:function(newValue, oldValue){
+                                item.summary=newValue
+                            }" style="width:200px"></td>
+                </tr>
+                
+                <tr>
+                    <td>内容&nbsp;</td>
+                    <td><textarea id="content" style="width: 100%;height:500px;padding:1px 4px" placeholder="
+                        图片自适应: 宽度: 100%, 高度: 空."></textarea></td>
+                </tr>
+
+                <tr>
+                    <td>基础浏览量&nbsp;</td>
+                    <td>
+                        <input id="viewCountBase" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.viewCountBase,
+                                precision:0,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.viewCountBase=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>基础分享量&nbsp;</td>
+                    <td>
+                        <input id="shareCountBase" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.shareCountBase,
+                                precision:0,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.shareCountBase=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>跳转Url&nbsp;</td>
+                    <td><input id="forwardUrl" class="easyui-textbox" style="width:100%" data-options="
+                        value:item.forwardUrl,
+                        iconWidth:20,
+                        icons:[{
+                            iconCls:'icon-clear',
+                            handler: function(e){
+                                debugger
+                                $(e.data.target).textbox('setValue','');
+                            }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            item.forwardUrl=newValue
+                        }" style="width:200px"></td>
+                </tr>
+                <tr>
+                    <td>排序号&nbsp;</td>
+                    <td>
+                        <input id="orderNo" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.orderNo,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.orderNo=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div id="datagridFoot" style="padding:2px 5px;">
+            <a id="createConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-save"  plain="true" title="确认"
+                onclick="createConfirm()">确认</a>
+            <a id="reset" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" title="重置"
+                onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(){location.reload()})">重置</a>
+        </div>
+</body>
+<script>
+        $('#datagrid').datagrid()
+</script>
+
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>集贤装-运维-主页</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="./favicon.ico" type="image/svg" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./layer/layer.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <style>
+
+    </style>
+
+    <script>
+        var config = null;
+        $.ajax({
+            url:'./config.json',
+            async:false,
+            success:function(res){
+                config=res;
+            }
+        })
+
+        layer.config({offset: '200px'});
+        $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+            $('#doingTag').show();
+        });
+        $.ajaxSetup({
+            complete:function(){
+                $('#doingTag').hide();
+            },
+            error:function(xhr){
+                
+            }
+        })
+
+        var login
+        $(document).ready(function(){
+            $.post(config.root+'/login-refresh',function(res){                
+                if(res.code==0){
+                    login = res.data;
+                    $('#nickname').text(login.nickname)
+                    if(login.logo)
+                        $('#logo').attr('src',login.logo)
+                }else{
+                    $.messager.confirm('提示', '您还未登录，是否去登录?', function(r){
+                        if (r){
+                            location.href="./login.html"
+                        }
+                    });
+                }
+            })
+        })
+    </script>
+</head>
+
+<body style="margin:0;padding:0;" class="easyui-layout">
+    <img id="doingTag" src="./image/doing.gif" style="width:100%;height:5px;position: absolute;top:0;z-index: 999999;display:none;" />
+
+    <div data-options="region:'north'," style="height:100px;position:relative;">
+        <h1 style="margin:20px 0 0 30px;">集贤装</h1>
+        <span style="margin:0 0 0 30px;vertical-align: middle;font-weight: 600;">运维</span>
+        <div style="position: absolute;bottom:5px;left:200px;">
+            <img id="logo" style="border:1px solid #858484;width:25px;height:25px;cursor:pointer;" src="./image/head.png"
+                onclick="
+                    $(this).parent().viewer({
+                        url: 'src'
+                    });"/>
+            <span id="nickname" style="margin-left:5px;width:100px;display: inline-block;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;"></span>
+        </div>
+    </div>
+    <div data-options="region:'west',title:'菜单',split:true" style="width:200px;">
+        <ul id="menu" ></ul>
+    </div>
+    <div data-options="region:'center'" style="background:#eee;">
+        <div id="tabs" class="easyui-tabs" style="width:100%;height:100%;"></div>
+        <div id="tabsTools">
+            <a href="javascript:void(0)" class="easyui-linkbutton" plain="true" iconCls="icon-clear"
+                onclick="
+                    $.messager.confirm('确认', '确认关闭所有标签吗?', function(r){
+                        if (r){
+                            $($('#tabs').tabs('tabs')).each(function(index,ele){ $('#tabs').tabs('close',),index})
+                        }
+                    });">
+            </a>
+        </div>
+    </div>
+</body>
+<script>
+    $('#menu').tree({
+        data:[
+           {
+                id:"user-manage",
+                text:"用户管理",
+                url:'./user-manage.html',
+            },{
+                id:"order-manage",
+                text:"订单管理",
+                url:'./order-manage.html',
+            },{
+                id:"article-manage",
+                text:"文章管理",
+                url:'./article-manage.html',
+            },{
+                id:"config-manage",
+                text:"参数配置",
+                url:'./config-manage.html',
+            },{
+                id:"logout",
+                text:"退出登录",
+            },
+        ],
+        onSelect: function(node){
+            debugger;
+            if(node.id=='logout'){
+                location.href='./login.html'
+                return;
+            }
+
+            project.newTab({id:node.id,title:node.text,url:node.url})
+           
+        }
+    });
+  
+
+    $('#tabs').tabs({
+        border:false,
+        tools: '#tabsTools',
+        fit: true,
+        onSelect:function(title){
+        }
+    });
+
+    $.parser.onComplete = function () {
+        debugger
+        
+    }
+
+    $(document).ready(function () {
+        var node = $('#menu').tree('find', 'user-manage');
+        $('#menu').tree('select', node.target);
+    });
+
+</script>
+
+</html>
