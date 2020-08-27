@@ -38,7 +38,14 @@ img {
 
     
    
-
+    var config = null;
+        $.ajax({
+            url:'./config.json',
+            async:false,
+            success:function(res){
+                config=res;
+            }
+        })
 
 
 
@@ -75,7 +82,7 @@ img {
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: '/upload-file',
+                                        url: config.root+'/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -135,7 +142,7 @@ function updateConfirm(){
             $.ajax({
                 type: 'post',
                 contentType:"text/plain",
-                url: '/upload-stream?'+$.param({ext:'html'}),
+                url: config.root+'/upload-stream?'+$.param({ext:'html'}),
                 async:false,
                 data: tinyMCE.editors[0].getContent() ,
                 success: function (res) {
@@ -177,7 +184,7 @@ function remove(){
         if(r)
         $.ajax({
                             type: 'post',
-                            url: '/maintain/article-manage/article-list-delete',
+                            url: config.root+'/maintain/article-manage/article-list-delete',
                             data: {articleId:item.articleId,expectCount:1},
                             success: function (res) {
                                 debugger
@@ -206,7 +213,7 @@ function remove(){
     <script>
          $.ajax({
         type: 'get',
-        url: `/maintain/article-manage/article-info?articleId=${qso.articleId}`,
+        url: config.root+`/maintain/article-manage/article-info?articleId=${qso.articleId}`,
         async: false,
         success: function (res) {
             debugger
@@ -253,9 +260,9 @@ function remove(){
                 <tr>
                     <td>封面&nbsp;</td>
                     <td>
-                        <div id="coverImage">
-                            <img style="display:none;" src="./favicon.ico" onload="$('#coverImage-value').attr('src',item.coverImage).parent().viewer({url: 'src',});if(item.coverImage) $('#coverImage-value').show();" />
-                            <img id="coverImage-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","../image/image-error.png");' />
+                        <div id="cover">
+                            <img style="display:none;" src="./favicon.ico" onload="$('#cover-value').attr('src',item.cover).parent().viewer({url: 'src',});if(item.cover) $('#cover-value').show();" />
+                            <img id="cover-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","../image/image-error.png");' />
                             <input type="file" style="display:none;" onchange="
                                 javascript:
                                 var target = this;
@@ -264,7 +271,7 @@ function remove(){
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: '/upload-file',
+                                        url: config.root+'/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -275,8 +282,8 @@ function remove(){
                                             if (res.codeMsg)
                                                 $.messager.alert('提示',res.codeMsg)
                                             if (res.code == 0) {
-                                                item.coverImage=res.data.url 
-                                                $(target).prev().attr('src',item.coverImage).show()
+                                                item.cover=res.data.url 
+                                                $(target).prev().attr('src',item.cover).show()
                                              target.value=null
                                             }
                                         }

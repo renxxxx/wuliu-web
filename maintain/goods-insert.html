@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>集贤装-运维-添加文章</title>
+    <title>集贤装-运维-添加大货</title>
     <meta charset="UTF-8">
     <link rel="icon" href="./favicon.ico" type="image/svg" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -142,7 +142,7 @@ if(r){
 
         $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/article-manage/article-insert',
+                            url: config.root+'/maintain/goods-manage/goods-insert',
                             data: item,
                             success: function (res) {
                                 debugger
@@ -171,7 +171,7 @@ if(r){
         <font>loading···</font>
     </div>
 
-        <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'创建文章'">
+        <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'创建大货'">
             <thead>
                 <tr>
                     <th data-options="field:'name',width:200,align:'right'">属性&nbsp;</th>
@@ -180,9 +180,9 @@ if(r){
             </thead>
             <tbody>
                 <tr>
-                    <td>文章标题&nbsp;</td>
-                    <td><input id="title" class="easyui-textbox" style="width:100%" data-options="
-                        value:item.title,
+                    <td>大货名称&nbsp;</td>
+                    <td><input id="name" class="easyui-textbox" style="width:100%" data-options="
+                        value:item.name,
                         iconWidth:20,
                         icons:[{
                             iconCls:'icon-clear',
@@ -192,7 +192,7 @@ if(r){
                             }
                         }],
                         onChange:function(newValue, oldValue){
-                            item.title=newValue
+                            item.name=newValue
                         }" style="width:200px"></td>
                 </tr>
                 <tr>
@@ -238,12 +238,12 @@ if(r){
                 </tr>
 
                 <tr>
-                    <td>摘要&nbsp;</td>
-                    <td><input id="summary" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
-                            value:item.summary,
+                    <td>简介&nbsp;</td>
+                    <td><input id="intro" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
+                            value:item.intro,
                             multiline:true,
                             onChange:function(newValue, oldValue){
-                                item.summary=newValue
+                                item.intro=newValue
                             }" style="width:200px"></td>
                 </tr>
                 
@@ -294,22 +294,6 @@ if(r){
                             " 
                         />
                     </td>
-                </tr>
-                <tr>
-                    <td>跳转Url&nbsp;</td>
-                    <td><input id="forwardUrl" class="easyui-textbox" style="width:100%" data-options="
-                        value:item.forwardUrl,
-                        iconWidth:20,
-                        icons:[{
-                            iconCls:'icon-clear',
-                            handler: function(e){
-                                debugger
-                                $(e.data.target).textbox('setValue','');
-                            }
-                        }],
-                        onChange:function(newValue, oldValue){
-                            item.forwardUrl=newValue
-                        }" style="width:200px"></td>
                 </tr>
                 <tr>
                     <td>排序号&nbsp;</td>

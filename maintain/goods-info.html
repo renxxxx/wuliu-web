@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>集贤装-运维-添加文章</title>
+    <title>集贤装-运维-大货信息</title>
     <meta charset="UTF-8">
     <link rel="icon" href="./favicon.ico" type="image/svg" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -24,17 +24,20 @@
 </head>
 
 <style>
-    img {
+img {
         object-fit:contain;
     }
 </style>
 
 <script>
 
+
+
     var qso = util.queryStringObject();
     var item = {},contentEditor
 
     
+   
     var config = null;
         $.ajax({
             url:'./config.json',
@@ -43,6 +46,10 @@
                 config=res;
             }
         })
+
+
+
+
     $.parser.onComplete = function () {
         debugger
     }
@@ -58,6 +65,14 @@
     force_p_newlines: false,
     images_upload_url: 'postAcceptor.php',
     language: "zh_CN",
+    init_instance_callback : function(editor) {
+        debugger;
+        if(item.contentUrl)
+            $.get(item.contentUrl,function(res){
+                editor.contentSrc=res
+                editor.setContent(res)
+            })
+    },
     file_picker_callback:function(callback,value,meta){
         debugger
         $(`<input type='file'>`).change(function(){
@@ -67,7 +82,7 @@
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url:config.root+ '/upload-file',
+                                        url: config.root+'/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -116,17 +131,18 @@
   });
 
         $("#loading").remove();
+        
     })
 
-
-function createConfirm(){
+function updateConfirm(){
     debugger
-    $.messager.confirm('提示','确认创建吗?',function(r){
-if(r){
-        $.ajax({
+    $.messager.confirm('提示','确认修改吗?',function(r){
+        if(r){
+            if(tinyMCE.editors[0].contentSrc!=tinyMCE.editors[0].getContent())
+            $.ajax({
                 type: 'post',
                 contentType:"text/plain",
-                url:config.root+ '/upload-stream?'+$.param({ext:'html'}),
+                url: config.root+'/upload-stream?ext=html',
                 async:false,
                 data: tinyMCE.editors[0].getContent() ,
                 success: function (res) {
@@ -139,28 +155,52 @@ if(r){
                 }
             })
 
-
-        $.ajax({
+            $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/article-manage/article-insert',
+                            url: '/maintain/goods-manage/goods-update',
                             data: item,
                             success: function (res) {
                                 debugger
                                 if (res.codeMsg)
-                                 $.messager.alert('提示',res.codeMsg)
+                                    $.messager.alert('提示',res.codeMsg);
                                 if (res.code == 0) {
                                     if (!res.codeMsg)
-                                    $.messager.alert('提示','操作成功',null,function(){
-                                                location.reload()
-                                            })
+                                          $.messager.alert('提示','操作成功',null,function(){ location.reload()});
                                 } 
                             }
                         })
-                    }
+        }
+      
     })
     
 }
         
+
+
+             
+function remove(){
+    debugger
+    $.messager.confirm('提示','确认删除吗？', function(r){
+        if(r)
+        $.ajax({
+                            type: 'post',
+                            url: config.root+'/maintain/goods-manage/goodses-delete',
+                            data: {goodsId:item.goodsId,expectCount:1},
+                            success: function (res) {
+                                debugger
+                                if (res.codeMsg)
+                                    $.messager.alert('提示',res.codeMsg);
+                                if (res.code == 0) {
+                                    if (!res.codeMsg)
+                                        $.messager.alert('提示','操作成功',null,function(){ location.reload()});
+                                } 
+                            }
+                        })
+        });
+
+
+                         
+}
 
 
 </script>
@@ -170,8 +210,22 @@ if(r){
     width: 100%; height: 100%; background: white; text-align: center;padding:5px 10px">
         <font>loading···</font>
     </div>
-
-        <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'创建文章'">
+    <script>
+         $.ajax({
+        type: 'get',
+        url: config.root+`/maintain/goods-manage/goods-info?goodsId=${qso.goodsId}`,
+        async: false,
+        success: function (res) {
+            debugger
+            if (res.codeMsg)
+                $.messager.alert('提示',res.codeMsg);
+            if (res.code == 0) {
+                item = res.data;
+            }
+        }
+    })
+    </script>
+        <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'大货详情'">
             <thead>
                 <tr>
                     <th data-options="field:'name',width:200,align:'right'">属性&nbsp;</th>
@@ -179,10 +233,18 @@ if(r){
                 </tr>
             </thead>
             <tbody>
+                 
                 <tr>
-                    <td>文章标题&nbsp;</td>
-                    <td><input id="title" class="easyui-textbox" style="width:100%" data-options="
-                        value:item.title,
+                    <td>大货Id&nbsp;</td>
+                    <td><span id="goodsId" style="margin-left: 5px;" ></span>
+                        <img src="./favicon.ico" onload="$('#goodsId').text(item.goodsId||'')" style="display:none;"/>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>大货名称&nbsp;</td>
+                    <td><input id="name" class="easyui-textbox" style="width:100%" data-options="
+                        value:item.name,
                         iconWidth:20,
                         icons:[{
                             iconCls:'icon-clear',
@@ -192,7 +254,7 @@ if(r){
                             }
                         }],
                         onChange:function(newValue, oldValue){
-                            item.title=newValue
+                            item.name=newValue
                         }" style="width:200px"></td>
                 </tr>
                 <tr>
@@ -238,12 +300,12 @@ if(r){
                 </tr>
 
                 <tr>
-                    <td>摘要&nbsp;</td>
-                    <td><input id="summary" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
-                            value:item.summary,
+                    <td>简介&nbsp;</td>
+                    <td><input id="intro" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
+                            value:item.intro,
                             multiline:true,
                             onChange:function(newValue, oldValue){
-                                item.summary=newValue
+                                item.intro=newValue
                             }" style="width:200px"></td>
                 </tr>
                 
@@ -253,6 +315,20 @@ if(r){
                         图片自适应: 宽度: 100%, 高度: 空."></textarea></td>
                 </tr>
 
+                <tr>
+                    <td>浏览量&nbsp;</td>
+                    <td>
+                        <span id="viewCount"  style="margin-left: 5px;"></span>
+                        <img src="./favicon.ico" onload="$('#viewCount').text(item.viewCount||'')" style="display:none;"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>浏览量&nbsp;</td>
+                    <td>
+                        <span id="shareCount"  style="margin-left: 5px;"></span>
+                        <img src="./favicon.ico" onload="$('#shareCount').text(item.shareCount||'')" style="display:none;"/>
+                    </td>
+                </tr>
                 <tr>
                     <td>基础浏览量&nbsp;</td>
                     <td>
@@ -296,22 +372,6 @@ if(r){
                     </td>
                 </tr>
                 <tr>
-                    <td>跳转Url&nbsp;</td>
-                    <td><input id="forwardUrl" class="easyui-textbox" style="width:100%" data-options="
-                        value:item.forwardUrl,
-                        iconWidth:20,
-                        icons:[{
-                            iconCls:'icon-clear',
-                            handler: function(e){
-                                debugger
-                                $(e.data.target).textbox('setValue','');
-                            }
-                        }],
-                        onChange:function(newValue, oldValue){
-                            item.forwardUrl=newValue
-                        }" style="width:200px"></td>
-                </tr>
-                <tr>
                     <td>排序号&nbsp;</td>
                     <td>
                         <input id="orderNo" class="easyui-numberbox" style="width:100%" 
@@ -332,15 +392,61 @@ if(r){
                         />
                     </td>
                 </tr>
+                <!-- <tr>
+                    <td>冻结&nbsp;</td>
+                    <td><span id="frozen"  ></span>
+                        <img src="./favicon.ico" onload="$('#audit').text(item.frozen==0?'否':item.frozen==1?'是':'')" style="display:none;"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>冻结信息&nbsp;</td>
+                    <td><span id="frozenNote"  ></span>
+                        <img src="./favicon.ico" onload="$('#frozenNote').text(item.frozenNote||'')" style="display:none;"/>
+                    </td>
+                </tr> -->
+                <tr>
+                    <td>创建时间&nbsp;</td>
+                    <td><input id="insertTime" class="easyui-datetimebox" style="width:100%" data-options="
+                                        value:moment(item.insertTime).format('YYYY-MM-DD H:mm:ss'),
+                                        editable:false,
+                                        icons:[{
+                                            iconCls:'icon-clear',
+                                            handler: function(e){
+                                                $(e.data.target).datetimebox('setValue','');
+                                            }
+                                        }],
+                                        onChange:function(newValue, oldValue){
+                                            item.insertTime=newValue
+                                        }"></td>
+                </tr>
+                <tr>
+                    <td>更新时间&nbsp;</td>
+                    <td><span id="updateTime" style="margin-left: 4px;"></span>
+                        <img src="./favicon.ico" onload="$('#updateTime').text(item.updateTime?moment(item.updateTime).format('YYYY-MM-DD HH:mm:ss'):'')" style="display:none;"/>
+                        </td>
+                </tr>
+
             </tbody>
         </table>
         
+
         <div id="datagridFoot" style="padding:2px 5px;">
-            <a id="createConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-save"  plain="true" title="确认"
-                onclick="createConfirm()">确认</a>
-            <a id="reset" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" title="重置"
-                onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(){location.reload()})">重置</a>
+            <a id="update" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" title="修改"
+                onclick="$('#update,#remove,#reload,#updatePasswordPageEntrance').hide();$('#updateConfirm,#updateCancel').show()">修改</a>
+            <a id="remove" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" title="删除"
+                onclick="remove()">删除</a>
+            <a id="reload" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload" plain="true" title="刷新"
+                onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})">刷新</a>
+            <a id="updateConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-save" plain="true" title="确认"
+                onclick="updateConfirm()">确认</a>
+            <a id="updateCancel" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-cancel" plain="true" title="取消"
+                onclick="$('#update,#remove,#reload,#updatePasswordPageEntrance').show();$('#updateConfirm,#updateCancel').hide()">取消</a>
         </div>
+
+
+
+
+        
 </body>
 <script>
         $('#datagrid').datagrid()

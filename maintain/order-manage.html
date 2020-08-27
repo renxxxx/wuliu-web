@@ -95,7 +95,7 @@
                 frozenColumns: [[
                     { field: 'ck', align: 'left', checkbox: true },
                     {
-                        field: 'orderId', title: 'Id', width: 250, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                        field: 'orderId', title: '订单Id', width: 250, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
                                         onclick="project.newTab({title:'订单信息:${value.substring(0, 10) + '...'}',url:'./order-info.html?orderId=${row.orderId}'})"
                                     >${value}

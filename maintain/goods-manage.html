@@ -2,7 +2,7 @@
 <html>
 
 <head lang="en">
-    <title>集贤装-运维-文章管理</title>
+    <title>集贤装-运维-大货管理</title>
     <meta charset="UTF-8">
     <link rel="icon" href="./favicon.ico" type="image/svg" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -47,7 +47,7 @@
         })
 
         var qso = util.queryStringObject();
-        var queryParam = {}, currentItemList = [], sum = {}
+        var queryParam = {}, currentItems = [], sum = {}
 
         $(document).ready(function(){
             
@@ -83,9 +83,9 @@
                 frozenColumns: [[
                     { field: 'ck', align: 'left', checkbox: true },
                     {
-                        field: 'title', title: '文章标题', width: 250, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                        field: 'name', title: '货物名称', width: 250, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
-                                        onclick="project.newTab({title:'文章信息:${value.substring(0, 10) + '...'}',url:'./article-info.html?articleId=${row.articleId}'})"
+                                        onclick="project.newTab({title:'大货信息:${value.substring(0, 10) + '...'}',url:'./goods-info.html?goodsId=${row.goodsId}'})"
                                     >${value}
                                     </a>`;
                         }, styler: function (value, row, index) {
@@ -93,7 +93,7 @@
                         }
                     }
                 ]],
-                idField: 'articleId',
+                idField: 'goodsId',
                 toolbar: `#datagridToolBar`,
                 footer: `#datagridFoot`,
                 pagination: true,
@@ -116,17 +116,17 @@
                     queryParam.pn = param.page;
                     queryParam.sort = param.sort;
                     queryParam.order = param.order;
-                    $.get(config.root+'/maintain/article-manage/article-list', queryParam, function (data) {
+                    $.get(config.root+'/maintain/goods-manage/goodses', queryParam, function (data) {
                         if (data.codeMsg)
                             $.messager.alert('提示',data.codeMsg);
                         if (data.code == 0) {
-                            currentItemList = data.data.itemList;
-                            $.get(config.root+'/maintain/article-manage/article-list-sum', queryParam, function (data) {
+                            currentItems = data.data.items;
+                            $.get(config.root+'/maintain/goods-manage/goodses-sum', queryParam, function (data) {
                                 if (data.codeMsg)
                                     $.messager.alert('提示',data.codeMsg);
                                 if (data.code == 0) {
                                     sum = data.data;
-                                    success({rows:currentItemList,total:sum.itemCount});
+                                    success({rows:currentItems,total:sum.itemCount});
                                 }
                             })
                         } else {
@@ -203,9 +203,9 @@
     <div id="datagridFoot" style="padding:2px 5px;">
          <a href="JavaScript:void(0)" class="easyui-linkbutton"  iconCls="icon-add" plain="true"
             onclick="
-                project.newTab({title:'添加文章',url:'./article-insert.html'})
+                project.newTab({title:'添加大货',url:'./goods-insert.html'})
             "
-            >添加文章
+            >添加大货
         </a>
         <!-- <a href="JavaScript:void(0)" class="easyui-linkbutton"  iconCls="icon-edit" plain="true"
             onclick="
