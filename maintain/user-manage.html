@@ -25,7 +25,7 @@
         debugger
         var config = null;
     $.ajax({
-        url:'./config.json',
+        url:'../config.json',
         async:false,
         success:function(res){
             config=res;
@@ -50,7 +50,7 @@
         var queryParam = {
             frozen:'0',
         }
-        var currentItemList = [], sum = {}
+        var currentItems = [], sum = {}
 
         $(document).ready(function(){
             $.post(config.root+'/login-refresh',function(res){                
@@ -82,9 +82,9 @@
                         }
                     },
                     {
-                        field: 'area1Id', title: '区域', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
-                            return `<span style="width:100%;display:inline-block;" title="${row.area1Name||''} ${row.area2Name||''}" 
-                                        >${row.area1Name||''} ${row.area2Name||''}
+                        field: 'area', title: '区域', width: 200, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${row.area1Name||''}${row.area2Name?(' / '+row.area2Name):''}${row.area3Name?(' / '+row.area3Name):''}" 
+                                        >${row.area1Name||''}${row.area2Name?(' / '+row.area2Name):''}${row.area3Name?(' / '+row.area3Name):''}
                                     </span>`;
                         }
                     },
@@ -142,17 +142,17 @@
                     queryParam.sort = param.sort;
                     queryParam.order = param.order;
 
-                    $.get(config.root+'/maintain/user-manage/user-list', queryParam, function (data) {
+                    $.get(config.root+'/maintain/user-manage/users', queryParam, function (data) {
                         if (data.codeMsg)
                             $.messager.alert('提示',data.codeMsg);
                         if (data.code == 0) {
-                            currentItemList = data.data.itemList;
-                            $.get(config.root+'/maintain/user-manage/user-list-sum', queryParam, function (data) {
+                            currentItems = data.data.items;
+                            $.get(config.root+'/maintain/user-manage/users-sum', queryParam, function (data) {
                                 if (data.codeMsg)
                                     $.messager.alert('提示',data.codeMsg);
                                 if (data.code == 0) {
                                     sum = data.data;
-                                    success({rows:currentItemList,total:sum.itemCount});
+                                    success({rows:currentItems,total:sum.itemCount});
                                 }
                             })
                         } else {
@@ -198,6 +198,284 @@
                         debugger
                         queryParam.kw=newValue
                     }" style="width:300px" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam-area1Id" class="easyui-combobox" label="省" labelPosition="left" labelAlign="right"  style="width:300px" data-options="
+                value:queryParam.area1Id,
+                text:queryParam.area1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../mess/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#queryParam-area1Id')[0]['area'+data[i].code]=data[i].children
+                                }
+
+                                $('#queryParam-area2Id').combobox('reload')
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        queryParam.area1Id=newValue
+                        queryParam.area1Name= $('#queryParam-area1Id').combobox('getText')
+
+                        queryParam.area2Id=null;
+                        queryParam.area2Name=null;
+                        $('#queryParam-area2Id').combobox('setText',null)
+                        $('#queryParam-area2Id').combobox('setValue',null)
+
+                        queryParam.area3Id=null;
+                        queryParam.area3Name=null;
+                        $('#queryParam-area3Id').combobox('setText',null)
+                        $('#queryParam-area3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            queryParam.area1Id=null;
+                            queryParam.area1Name=null;
+                            $('#queryParam-area1Id').combobox('setText',null)
+                            $('#queryParam-area1Id').combobox('setValue',null)
+
+                            queryParam.area2Id=null;
+                            queryParam.area2Name=null;
+                            $('#queryParam-area2Id').combobox('setText',null)
+                            $('#queryParam-area2Id').combobox('setValue',null)
+
+                            queryParam.area3Id=null;
+                            queryParam.area3Name=null;
+                            $('#queryParam-area3Id').combobox('setText',null)
+                            $('#queryParam-area3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam-area2Id" class="easyui-combobox" label="市" labelPosition="left" labelAlign="right"  style="width:300px" data-options="
+                valueField:'code',
+                textField:'name',
+                mode:'remote',
+                onShowPanel:function(){
+                    $(this).combobox('reload')
+                },
+
+                loader: function (param, success, error) {
+                    debugger
+                    var ss = $('#queryParam-area1Id')[0]['area'+queryParam.area1Id];
+                    for(var i=0;ss && i<ss.length;i++){
+                        debugger
+                        $('#queryParam-area2Id')[0]['area'+ss[i].code]=ss[i].children
+                    }
+                    success({rows:ss?ss:[]});
+                    
+                },
+                onChange:function(newValue, oldValue){
+                    debugger
+                    queryParam.area2Id=newValue
+                    queryParam.area2Name= $('#queryParam-area2Id').combobox('getText')
+
+                    queryParam.area3Id=null;
+                    queryParam.area3Name=null;
+                    $('#queryParam-area3Id').combobox('setText',null)
+                    $('#queryParam-area3Id').combobox('setValue',null)
+
+                },
+                loadFilter: function (data) {
+                    debugger
+                    return data.rows;
+                },
+                iconWidth:20,
+                icons:[{
+                    iconCls:'icon-clear',
+                    handler: function(e){
+                        $(e.data.target).combobox('setValue','');
+                        queryParam.area2Id=null;
+                        queryParam.area2Name=null;
+                        $('#queryParam-area2Id').combobox('setText',null)
+                        $('#queryParam-area2Id').combobox('setValue',null)
+
+                        queryParam.area3Id=null;
+                        queryParam.area3Name=null;
+                        $('#queryParam-area3Id').combobox('setText',null)
+                        $('#queryParam-area3Id').combobox('setValue',null)
+                    }
+                }]
+                ">
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam-area3Id" class="easyui-combobox" label="区" labelPosition="left" labelAlign="right"  style="width:300px" data-options="
+                    value:queryParam.area3Id,
+                    text:queryParam.area3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#queryParam-area2Id')[0]['area'+queryParam.area2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        queryParam.area3Id=newValue
+                        queryParam.area3Name= $('#queryParam-area3Id').combobox('getText')
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            queryParam.area3Id=null;
+                            queryParam.area3Name=null;
+                            $('#queryParam-area3Id').combobox('setText',null)
+                            $('#queryParam-area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+            </div>
+            <div style="display:inline-block;">
+                <input id="queryParam.renZhengIs" class="easyui-combobox" label="认证:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.renZhengIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未认证',
+                                value: '0'
+                            },
+                            {
+                                text: '通过',
+                                value: '1'
+                            },
+                            {
+                                text: '拒绝',
+                                value: '2'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.renZhengIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.renZhengTiJiaoIs" class="easyui-combobox" label="提交认证:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.renZhengTiJiaoIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未提交',
+                                value: '0'
+                            },
+                            {
+                                text: '已提交',
+                                value: '1'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.renZhengTiJiaoIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.fuWuShangRenZhengIs" class="easyui-combobox" label="服务商认证:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.fuWuShangRenZhengIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未认证',
+                                value: '0'
+                            },
+                            {
+                                text: '通过',
+                                value: '1'
+                            },
+                            {
+                                text: '拒绝',
+                                value: '2'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.fuWuShangRenZhengIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.fuWuShangRenZhengTiJiaoIs" class="easyui-combobox" label="服务商提交认证:"  labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.fuWuShangRenZhengTiJiaoIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未提交',
+                                value: '0'
+                            },
+                            {
+                                text: '已提交',
+                                value: '1'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.fuWuShangRenZhengTiJiaoIs=newValue
+                        }" />
             </div>
 
             <div style="display:inline-block;">

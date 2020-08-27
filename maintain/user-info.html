@@ -25,7 +25,7 @@
 <script>
 var config = null;
     $.ajax({
-        url:'./config.json',
+        url:'../config.json',
         async:false,
         success:function(res){
             config=res;
@@ -99,7 +99,7 @@ var config = null;
             if(r)
             $.ajax({
                 type: 'post',
-                url: config.root+'/maintain/user-manage/user-list-delete',
+                url: config.root+'/maintain/user-manage/users-delete',
                 data: {userId:item.userId,expectCount:1},
                 success: function (res) {
                     debugger
@@ -238,6 +238,212 @@ var config = null;
                     }" style="width:200px"></td>
             </tr>
             <tr>
+                <td>身份证&nbsp;</td>
+                <td>
+                    <div id="idCard">
+                        <img style="display:none;" src="./favicon.ico" onload="$('#idCard-value').attr('src',item.idCard).parent().viewer({url: 'src',});if(item.idCard) $('#idCard-value').show();" />
+                        <img id="idCard-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","../image/image-error.png");' />
+                        <input type="file" style="display:none;" onchange="
+                            javascript:
+                            var target = this;
+                            if(this.files.length>0){
+                                var file = this.files[0];
+                                var fd = new FormData()
+                                fd.append('file', file);
+                                $.ajax({
+                                    url: config.root+'/upload-file',
+                                    type: 'POST',
+                                    data: fd,
+                                    cache: false,
+                                    processData: false,
+                                    contentType: false,
+                                    async: true,
+                                    success: function (res) {
+                                        if (res.codeMsg)
+                                            $.messager.alert('提示',res.codeMsg)
+                                        if (res.code == 0) {
+                                            item.idCard=res.data.url 
+                                            $(target).prev().attr('src',item.idCard).show()
+                                         target.value=null
+                                        }
+                                    }
+                                })
+                            }
+                        " />
+                        <a title="删除" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" plain="true"
+                            style="vertical-align: text-bottom;"
+                            onclick="$(this).prev().prev().attr('src',null).hide();item.idCard='';"></a>
+
+                        <a title="选择" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-choose" plain="true"
+                            style="vertical-align: text-bottom;" onclick="$(this).prev().prev().click()"></a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>地区</td>
+                <td><input id="area1Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.area1Id,
+                    text:item.area1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../mess/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#area1Id')[0]['area'+data[i].code]=data[i].children
+                                }
+                                $('#area2Id').combobox('reload')
+
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.area1Id=newValue
+                        item.area1Name= $('#area1Id').combobox('getText')
+
+                        item.area2Id=null;
+                        item.area2Name=null;
+                        $('#area2Id').combobox('setText',null)
+                        $('#area2Id').combobox('setValue',null)
+
+                        item.area3Id=null;
+                        item.area3Name=null;
+                        $('#area3Id').combobox('setText',null)
+                        $('#area3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.area1Id=null;
+                            item.area1Name=null;
+                            $('#area1Id').combobox('setText',null)
+                            $('#area1Id').combobox('setValue',null)
+
+                            item.area2Id=null;
+                            item.area2Name=null;
+                            $('#area2Id').combobox('setText',null)
+                            $('#area2Id').combobox('setValue',null)
+
+                            item.area3Id=null;
+                            item.area3Name=null;
+                            $('#area3Id').combobox('setText',null)
+                            $('#area3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+                    <input id="area2Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.area2Id,
+                    text:item.area2Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#area1Id')[0]['area'+item.area1Id];
+                        for(var i=0;ss && i<ss.length;i++){
+                            debugger
+                            $('#area2Id')[0]['area'+ss[i].code]=ss[i].children
+                        }
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.area2Id=newValue
+                        item.area2Name= $('#area2Id').combobox('getText')
+
+                        item.area3Id=null;
+                        item.area3Name=null;
+                        $('#area3Id').combobox('setText',null)
+                        $('#area3Id').combobox('setValue',null)
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.area2Id=null;
+                            item.area2Name=null;
+                            $('#area2Id').combobox('setText',null)
+                            $('#area2Id').combobox('setValue',null)
+
+                            item.area3Id=null;
+                            item.area3Name=null;
+                            $('#area3Id').combobox('setText',null)
+                            $('#area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+                    <input id="area3Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.area3Id,
+                    text:item.area3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#area2Id')[0]['area'+item.area2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.area3Id=newValue
+                        item.area3Name= $('#area3Id').combobox('getText')
+
+                       
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.area3Id=null;
+                            item.area3Name=null;
+                            $('#area3Id').combobox('setText',null)
+                            $('#area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    "></td>
+            </tr>
+            <tr>
                 <td>管理员&nbsp;</td>
                 <td><input id="adminIs" class="easyui-combobox" style="width:100%" data-options="
                                 value:item.adminIs,
@@ -283,6 +489,121 @@ var config = null;
                                     item.maintainIs=newValue
                                  }" /></td>
             </tr>
+             <tr>
+                <td>认证&nbsp;</td>
+                <td>
+                    <span id="renZhengIs"  style="margin-left:5px;"></span>
+                    <img src="./favicon.ico" style="display:none;"
+                        onload="
+                            $('#renZhengIs').text(item.renZhengIs==1?'通过':item.renZhengIs==0?'拒绝':'')
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>认证类型&nbsp;</td>
+                <td><input id="renZhengType" class="easyui-combobox" style="width:100%" data-options="
+                                value:item.renZhengType,
+                                editable:false,panelHeight:'auto',
+                                data:[{
+                                    text: '个人',
+                                    value: '1'
+                                },{
+                                     text: '公司',
+                                     value: '2'
+                                 },{
+                                    text: '贸易',
+                                    value: '3'
+                                }],
+                                 iconWidth:20,
+                                 icons:[{
+                                     iconCls:'icon-clear',
+                                     handler: function(e){
+                                         $(e.data.target).combobox('setValue','');
+                                     }
+                                 }],
+                                 onChange:function(newValue, oldValue){
+                                    item.renZhengType=newValue
+                                 }" /></td>
+            </tr>
+            <tr>
+                <td>公司名&nbsp;</td>
+                <td><input id="company" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.company,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.company=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
+                <td>营业执照&nbsp;</td>
+                <td>
+                    <div id="yingYeZhiZhao">
+                        <img style="display:none;" src="./favicon.ico" onload="$('#yingYeZhiZhao-value').attr('src',item.yingYeZhiZhao).parent().viewer({url: 'src',});if(item.yingYeZhiZhao) $('#yingYeZhiZhao-value').show();" />
+                        <img id="yingYeZhiZhao-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","../image/image-error.png");' />
+                        <input type="file" style="display:none;" onchange="
+                            javascript:
+                            var target = this;
+                            if(this.files.length>0){
+                                var file = this.files[0];
+                                var fd = new FormData()
+                                fd.append('file', file);
+                                $.ajax({
+                                    url: config.root+'/upload-file',
+                                    type: 'POST',
+                                    data: fd,
+                                    cache: false,
+                                    processData: false,
+                                    contentType: false,
+                                    async: true,
+                                    success: function (res) {
+                                        if (res.codeMsg)
+                                            $.messager.alert('提示',res.codeMsg)
+                                        if (res.code == 0) {
+                                            item.yingYeZhiZhao=res.data.url 
+                                            $(target).prev().attr('src',item.yingYeZhiZhao).show()
+                                         target.value=null
+                                        }
+                                    }
+                                })
+                            }
+                        " />
+                        <a title="删除" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" plain="true"
+                            style="vertical-align: text-bottom;"
+                            onclick="$(this).prev().prev().attr('src',null).hide();item.yingYeZhiZhao='';"></a>
+
+                        <a title="选择" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-choose" plain="true"
+                            style="vertical-align: text-bottom;" onclick="$(this).prev().prev().click()"></a>
+                    </div>
+                </td>
+            </tr>
+           <tr>
+                <td>服务商认证&nbsp;</td>
+                <td>
+                    <span id="fuWuShangRenZhengIs"  style="margin-left:5px;"></span>
+                    <img src="./favicon.ico" style="display:none;"
+                        onload="
+                            $('#fuWuShangRenZhengIs').text(item.fuWuShangRenZhengIs==1?'通过':item.fuWuShangRenZhengIs==0?'拒绝':'')
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>服务商简介&nbsp;</td>
+                <td><input id="fuWuShangIntro" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
+                        value:item.fuWuShangIntro,
+                        multiline:true,
+                        onChange:function(newValue, oldValue){
+                            item.fuWuShangIntro=newValue
+                        }" style="width:200px"></td>
+            </tr> 
             <tr>
                 <td>冻结&nbsp;</td>
                 <td>
@@ -352,6 +673,111 @@ var config = null;
         <a id="reload" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" 
             onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})"
             >刷新
+        </a>
+
+        <a id="renZhengPass" href="JavaScript:void(0)" class="easyui-linkbutton" style="" iconCls=""  plain="true" 
+            onclick="
+               
+                            $.messager.confirm('提示','确认通过认证吗？', function(r){
+                                if(r)
+                                $.ajax({
+                                                    type: 'post',
+                                                    url: config.root+'/maintain/user-manage/ren-zheng-pass',
+                                                    data: {userId:item.userId},
+                                                    success: function (res) {
+                                                        debugger
+                                                        if (res.codeMsg)
+                                                            $.messager.alert('提示',res.codeMsg);
+                                                        if (res.code == 0) {
+                                                            if (!res.codeMsg)
+                                                                $.messager.alert('提示','操作成功',null,function(){ location.reload()});
+                                                        } 
+                                                    }
+                                                })
+                                });   
+            "
+            >认证通过
+        </a>
+
+        <a id="renZhengUnpass" href="JavaScript:void(0)" class="easyui-linkbutton" style="" iconCls=""  plain="true" 
+            onclick="
+                 $.messager.prompt('提示','请输入拒绝原因',function(r){
+                        if (r){
+                            var note = r;
+                            $.messager.confirm('提示','确认拒绝认证吗？', function(r){
+                                if(r)
+                                $.ajax({
+                                                    type: 'post',
+                                                    url: config.root+'/maintain/user-manage/ren-zheng-unpass',
+                                                    data: {userId:item.userId,note:note},
+                                                    success: function (res) {
+                                                        debugger
+                                                        if (res.codeMsg)
+                                                            $.messager.alert('提示',res.codeMsg);
+                                                        if (res.code == 0) {
+                                                            if (!res.codeMsg)
+                                                                $.messager.alert('提示','操作成功',null,function(){ location.reload()});
+                                                        } 
+                                                    }
+                                                })
+                                });     
+
+                                    }
+                            })   
+            "
+            >认证拒绝
+        </a>
+
+        <a id="fuWuShangRenZhengPass" href="JavaScript:void(0)" class="easyui-linkbutton" style="" iconCls=""  plain="true" 
+            onclick="
+                 $.messager.confirm('提示','确认通过服务商认证吗？', function(r){
+                                if(r)
+                                $.ajax({
+                                                    type: 'post',
+                                                    url: config.root+'/maintain/user-manage/fu-wu-shang-ren-zheng-pass',
+                                                    data: {userId:item.userId},
+                                                    success: function (res) {
+                                                        debugger
+                                                        if (res.codeMsg)
+                                                            $.messager.alert('提示',res.codeMsg);
+                                                        if (res.code == 0) {
+                                                            if (!res.codeMsg)
+                                                                $.messager.alert('提示','操作成功',null,function(){ location.reload()});
+                                                        } 
+                                                    }
+                                                })
+                                });   
+            "
+            >服务商认证通过
+        </a>
+
+        <a id="fuWuShangRenZhengUnpass" href="JavaScript:void(0)" class="easyui-linkbutton" style="" iconCls=""  plain="true" 
+            onclick="
+                 $.messager.prompt('提示','请输入拒绝原因',function(r){
+                        if (r){
+                            var note = r;
+                            $.messager.confirm('提示','确认拒绝服务商认证吗？', function(r){
+                                if(r)
+                                $.ajax({
+                                                    type: 'post',
+                                                    url: config.root+'/maintain/user-manage/fu-wu-shang-ren-zheng-unpass',
+                                                    data: {userId:item.userId,note:note},
+                                                    success: function (res) {
+                                                        debugger
+                                                        if (res.codeMsg)
+                                                            $.messager.alert('提示',res.codeMsg);
+                                                        if (res.code == 0) {
+                                                            if (!res.codeMsg)
+                                                                $.messager.alert('提示','操作成功',null,function(){ location.reload()});
+                                                        } 
+                                                    }
+                                                })
+                                });     
+
+                                    }
+                            })   
+            "
+            >服务商认证拒绝
         </a>
     </div>
         
