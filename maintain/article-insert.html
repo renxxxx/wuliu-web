@@ -67,7 +67,7 @@
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url:config.root+ '/upload-file',
+                                        url:'/wuliu/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -126,7 +126,7 @@ if(r){
         $.ajax({
                 type: 'post',
                 contentType:"text/plain",
-                url:config.root+ '/upload-stream?'+$.param({ext:'html'}),
+                url:'/wuliu/upload-stream?'+$.param({ext:'html'}),
                 async:false,
                 data: tinyMCE.editors[0].getContent() ,
                 success: function (res) {
@@ -142,7 +142,7 @@ if(r){
 
         $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/article-manage/article-insert',
+                            url: '/wuliu/maintain/article-manage/article-insert',
                             data: item,
                             success: function (res) {
                                 debugger
@@ -209,7 +209,7 @@ if(r){
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file',
+                                        url: '/wuliu/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -339,7 +339,7 @@ if(r){
             <a id="createConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-save"  plain="true" title="确认"
                 onclick="createConfirm()">确认</a>
             <a id="reset" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" title="重置"
-                onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(){location.reload()})">重置</a>
+                onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})">重置</a>
         </div>
 </body>
 <script>

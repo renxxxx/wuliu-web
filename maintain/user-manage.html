@@ -53,7 +53,7 @@
         var currentItems = [], sum = {}
 
         $(document).ready(function(){
-            $.post(config.root+'/login-refresh',function(res){                
+            $.post('/wuliu/login-refresh',function(res){                
                 if(res.code==0){
                     
                 }else{
@@ -142,12 +142,12 @@
                     queryParam.sort = param.sort;
                     queryParam.order = param.order;
 
-                    $.get(config.root+'/maintain/user-manage/users', queryParam, function (data) {
+                    $.get('/wuliu/maintain/user-manage/users', queryParam, function (data) {
                         if (data.codeMsg)
                             $.messager.alert('提示',data.codeMsg);
                         if (data.code == 0) {
                             currentItems = data.data.items;
-                            $.get(config.root+'/maintain/user-manage/users-sum', queryParam, function (data) {
+                            $.get('/wuliu/maintain/user-manage/users-sum', queryParam, function (data) {
                                 if (data.codeMsg)
                                     $.messager.alert('提示',data.codeMsg);
                                 if (data.code == 0) {
@@ -213,7 +213,7 @@
                     loader: function (param, success, error) {
                         debugger
                         $.ajax({
-                            url: '../mess/area.json',
+                            url: '../other/area.json',
                             type: 'get',
                             data: {},
                             success: function (data) {
@@ -590,7 +590,7 @@
                         if(r)
                             $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/wx-videoaccount/delete-wx-videoaccount-list',
+                            url: '/wuliu/maintain/wx-videoaccount/delete-wx-videoaccount-list',
                             data: $.extend({},queryParam,{wxVideoaccountId:ids.length==0?null:ids.join(),expectedItemCount:ids.length==0?sum.itemCount:ids.length}),
                             success: function (res) {
                                 debugger

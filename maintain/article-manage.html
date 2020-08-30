@@ -116,12 +116,12 @@
                     queryParam.pn = param.page;
                     queryParam.sort = param.sort;
                     queryParam.order = param.order;
-                    $.get(config.root+'/maintain/article-manage/article-list', queryParam, function (data) {
+                    $.get('/wuliu/maintain/article-manage/article-list', queryParam, function (data) {
                         if (data.codeMsg)
                             $.messager.alert('提示',data.codeMsg);
                         if (data.code == 0) {
                             currentItemList = data.data.itemList;
-                            $.get(config.root+'/maintain/article-manage/article-list-sum', queryParam, function (data) {
+                            $.get('/wuliu/maintain/article-manage/article-list-sum', queryParam, function (data) {
                                 if (data.codeMsg)
                                     $.messager.alert('提示',data.codeMsg);
                                 if (data.code == 0) {
@@ -232,7 +232,7 @@
                         if(r)
                             $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/wx-videoaccount/delete-wx-videoaccount-list',
+                            url: '/wuliu/maintain/wx-videoaccount/delete-wx-videoaccount-list',
                             data: $.extend({},queryParam,{wxVideoaccountId:ids.length==0?null:ids.join(),expectedItemCount:ids.length==0?sum.itemCount:ids.length}),
                             success: function (res) {
                                 debugger

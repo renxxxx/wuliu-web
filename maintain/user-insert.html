@@ -62,7 +62,7 @@
         $.messager.confirm('提示','确认创建吗?',function(){
             $.ajax({
                     type: 'post',
-                    url: config.root+'/maintain/user-manage/user-insert',
+                    url: '/wuliu/maintain/user-manage/user-insert',
                     data: item,
                     success: function (res) {
                         debugger
@@ -82,7 +82,7 @@
 </script>
 
 <body style="margin:0;padding:0;">
-        <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'创建问卷'">
+        <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'创建订单'">
             <thead>
                 <tr>
                     <th data-options="field:'name',width:200,align:'right'">属性&nbsp;</th>
@@ -104,6 +104,22 @@
                         }],
                         onChange:function(newValue, oldValue){
                             item.nickname=newValue
+                        }" style="width:200px"></td>
+                </tr>
+                <tr>
+                    <td>账号&nbsp;</td>
+                    <td><input id="account" class="easyui-textbox" style="width:100%" data-options="
+                        value:item.account,
+                        iconWidth:20,
+                        icons:[{
+                            iconCls:'icon-clear',
+                            handler: function(e){
+                                debugger
+                                $(e.data.target).textbox('setValue','');
+                            }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            item.account=newValue
                         }" style="width:200px"></td>
                 </tr>
                 <tr>
@@ -223,7 +239,7 @@
             <a id="createConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-ok"  plain="true" title="确认"
                 onclick="insertItem()">确认</a>
             <a id="reset" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" title="重置"
-                onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(){location.reload()})">重置</a>
+                onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})">重置</a>
         </div>
 </body>
 <script>

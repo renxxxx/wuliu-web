@@ -82,7 +82,7 @@ img {
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file',
+                                        url: '/wuliu/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -142,7 +142,7 @@ function updateConfirm(){
             $.ajax({
                 type: 'post',
                 contentType:"text/plain",
-                url: config.root+'/upload-stream?'+$.param({ext:'html'}),
+                url: '/wuliu/upload-stream?'+$.param({ext:'html'}),
                 async:false,
                 data: tinyMCE.editors[0].getContent() ,
                 success: function (res) {
@@ -184,7 +184,7 @@ function remove(){
         if(r)
         $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/article-manage/article-list-delete',
+                            url: '/wuliu/maintain/article-manage/article-list-delete',
                             data: {articleId:item.articleId,expectCount:1},
                             success: function (res) {
                                 debugger
@@ -213,7 +213,7 @@ function remove(){
     <script>
          $.ajax({
         type: 'get',
-        url: config.root+`/maintain/article-manage/article-info?articleId=${qso.articleId}`,
+        url: `/wuliu/maintain/article-manage/article-info?articleId=${qso.articleId}`,
         async: false,
         success: function (res) {
             debugger
@@ -271,7 +271,7 @@ function remove(){
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file',
+                                        url: '/wuliu/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,

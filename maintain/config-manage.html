@@ -54,7 +54,7 @@
 
     $.ajax({
         type: 'get',
-        url: config.root+`/maintain/config-manage/config-info`,
+        url: `/wuliu/maintain/config-manage/config-info`,
         data:{name:'userProtocol,company,companyShortName,tel,phone,address,email,icp,longitude,latitude,qq,wxQrcode,wx,wxOappQrcode,wxOappName,stockCode,seoTitle,seoKeywords,seoDescription'},
         async: false,
         success: function (res) {
@@ -101,7 +101,7 @@
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file?' + $.param({ quality: 0.8 }),
+                                        url: '/wuliu/upload-file?' + $.param({ quality: 0.8 }),
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -157,7 +157,7 @@ function updateConfirm(){
                 $.ajax({
                     type: 'post',
                     contentType:"text/plain",
-                    url: config.root+'/upload-stream?'+$.param({ext:'html'}),
+                    url: '/wuliu/upload-stream?'+$.param({ext:'html'}),
                     async:false,
                     data: tinyMCE.editors[0].getContent(),
                     success: function (res) {
@@ -172,7 +172,7 @@ function updateConfirm(){
             
             $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/config-manage/config-update',
+                            url: '/wuliu/maintain/config-manage/config-update',
                             data: item,
                             success: function (res) {
                                 debugger
@@ -400,7 +400,7 @@ function updateConfirm(){
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file?' + $.param({ quality: 0.8 }),
+                                        url: '/wuliu/upload-file?' + $.param({ quality: 0.8 }),
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -458,7 +458,7 @@ function updateConfirm(){
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file?' + $.param({ quality: 0.8 }),
+                                        url: '/wuliu/upload-file?' + $.param({ quality: 0.8 }),
                                         type: 'POST',
                                         data: fd,
                                         cache: false,

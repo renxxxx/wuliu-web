@@ -51,7 +51,7 @@ var config = null;
 
     $.ajax({
         type: 'get',
-        url: config.root+`/maintain/user-manage/user-info?userId=${qso.userId}`,
+        url: `/wuliu/maintain/user-manage/user-info?userId=${qso.userId}`,
         async: false,
         success: function (res) {
             debugger
@@ -77,7 +77,7 @@ var config = null;
             if(r){
                 $.ajax({
                         type: 'post',
-                        url: config.root+'/maintain/user-manage/user-update',
+                        url: '/wuliu/maintain/user-manage/user-update',
                         data: item,
                         success: function (res) {
                             debugger
@@ -99,7 +99,7 @@ var config = null;
             if(r)
             $.ajax({
                 type: 'post',
-                url: config.root+'/maintain/user-manage/users-delete',
+                url: '/wuliu/maintain/user-manage/users-delete',
                 data: {userId:item.userId,expectCount:1},
                 success: function (res) {
                     debugger
@@ -123,7 +123,7 @@ var config = null;
             if(r)
             $.ajax({
                                 type: 'post',
-                                url: config.root+'/maintain/user-manage/user-frozen',
+                                url: '/wuliu/maintain/user-manage/user-frozen',
                                 data: {userId:item.userId,reason:reason,expectedItemCount:1},
                                 success: function (res) {
                                     debugger
@@ -147,7 +147,7 @@ var config = null;
             if(r)
             $.ajax({
                                 type: 'post',
-                                url: config.root+'/maintain/user-manage/user-unfrozen',
+                                url: '/wuliu/maintain/user-manage/user-unfrozen',
                                 data: {userId:item.userId,expectedItemCount:1},
                                 success: function (res) {
                                     debugger
@@ -206,6 +206,22 @@ var config = null;
                 </td>
             </tr>
             <tr>
+                <td>账号&nbsp;</td>
+                <td><input id="account" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.account,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.account=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
                 <td>手机&nbsp;</td>
                 <td><input id="phone" class="easyui-textbox" style="width:100%" data-options="
                     value:item.phone,
@@ -251,7 +267,7 @@ var config = null;
                                 var fd = new FormData()
                                 fd.append('file', file);
                                 $.ajax({
-                                    url: config.root+'/upload-file',
+                                    url: '/wuliu/upload-file',
                                     type: 'POST',
                                     data: fd,
                                     cache: false,
@@ -293,7 +309,7 @@ var config = null;
                     loader: function (param, success, error) {
                         debugger
                         $.ajax({
-                            url: '../mess/area.json',
+                            url: '../other/area.json',
                             type: 'get',
                             data: {},
                             success: function (data) {
@@ -495,7 +511,7 @@ var config = null;
                     <span id="renZhengIs"  style="margin-left:5px;"></span>
                     <img src="./favicon.ico" style="display:none;"
                         onload="
-                            $('#renZhengIs').text(item.renZhengIs==1?'通过':item.renZhengIs==0?'拒绝':'')
+                            $('#renZhengIs').text(item.renZhengIs==0?'未认证':item.renZhengIs==1?'通过':item.renZhengIs==2?'拒绝':'')
                         "
                     />
                 </td>
@@ -556,7 +572,7 @@ var config = null;
                                 var fd = new FormData()
                                 fd.append('file', file);
                                 $.ajax({
-                                    url: config.root+'/upload-file',
+                                    url: '/wuliu/upload-file',
                                     type: 'POST',
                                     data: fd,
                                     cache: false,
@@ -590,7 +606,7 @@ var config = null;
                     <span id="fuWuShangRenZhengIs"  style="margin-left:5px;"></span>
                     <img src="./favicon.ico" style="display:none;"
                         onload="
-                            $('#fuWuShangRenZhengIs').text(item.fuWuShangRenZhengIs==1?'通过':item.fuWuShangRenZhengIs==0?'拒绝':'')
+                            $('#fuWuShangRenZhengIs').text(item.fuWuShangRenZhengIs==0?'未认证':item.fuWuShangRenZhengIs==1?'通过':item.fuWuShangRenZhengIs==2?'拒绝':'')
                         "
                     />
                 </td>
@@ -682,7 +698,7 @@ var config = null;
                                 if(r)
                                 $.ajax({
                                                     type: 'post',
-                                                    url: config.root+'/maintain/user-manage/ren-zheng-pass',
+                                                    url: '/wuliu/maintain/user-manage/ren-zheng-pass',
                                                     data: {userId:item.userId},
                                                     success: function (res) {
                                                         debugger
@@ -708,7 +724,7 @@ var config = null;
                                 if(r)
                                 $.ajax({
                                                     type: 'post',
-                                                    url: config.root+'/maintain/user-manage/ren-zheng-unpass',
+                                                    url: '/wuliu/maintain/user-manage/ren-zheng-unpass',
                                                     data: {userId:item.userId,note:note},
                                                     success: function (res) {
                                                         debugger
@@ -734,7 +750,7 @@ var config = null;
                                 if(r)
                                 $.ajax({
                                                     type: 'post',
-                                                    url: config.root+'/maintain/user-manage/fu-wu-shang-ren-zheng-pass',
+                                                    url: '/wuliu/maintain/user-manage/fu-wu-shang-ren-zheng-pass',
                                                     data: {userId:item.userId},
                                                     success: function (res) {
                                                         debugger
@@ -760,7 +776,7 @@ var config = null;
                                 if(r)
                                 $.ajax({
                                                     type: 'post',
-                                                    url: config.root+'/maintain/user-manage/fu-wu-shang-ren-zheng-unpass',
+                                                    url: '/wuliu/maintain/user-manage/fu-wu-shang-ren-zheng-unpass',
                                                     data: {userId:item.userId,note:note},
                                                     success: function (res) {
                                                         debugger

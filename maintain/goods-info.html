@@ -82,7 +82,7 @@ img {
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file',
+                                        url: '/wuliu/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -142,7 +142,7 @@ function updateConfirm(){
             $.ajax({
                 type: 'post',
                 contentType:"text/plain",
-                url: config.root+'/upload-stream?ext=html',
+                url: '/wuliu/upload-stream?ext=html',
                 async:false,
                 data: tinyMCE.editors[0].getContent() ,
                 success: function (res) {
@@ -155,9 +155,16 @@ function updateConfirm(){
                 }
             })
 
+            var selected1Option = $('#type1 option:selected');
+            item.type1Id=selected1Option.val()
+            item.type1Name=selected1Option.text()
+            var selected2Option = $('#type2 option:selected');
+            item.type2Id=selected2Option.val()
+            item.type2Name=selected2Option.text()
+
             $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/goods-manage/goods-update',
+                            url: '/wuliu/maintain/goods-manage/goods-update',
                             data: item,
                             success: function (res) {
                                 debugger
@@ -184,7 +191,7 @@ function remove(){
         if(r)
         $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/goods-manage/goodses-delete',
+                            url: '/wuliu/maintain/goods-manage/goodses-delete',
                             data: {goodsId:item.goodsId,expectCount:1},
                             success: function (res) {
                                 debugger
@@ -213,7 +220,7 @@ function remove(){
     <script>
          $.ajax({
         type: 'get',
-        url: config.root+`/maintain/goods-manage/goods-info?goodsId=${qso.goodsId}`,
+        url: `/wuliu/maintain/goods-manage/goods-info?goodsId=${qso.goodsId}`,
         async: false,
         success: function (res) {
             debugger
@@ -271,7 +278,7 @@ function remove(){
                                     var fd = new FormData()
                                     fd.append('file', file);
                                     $.ajax({
-                                        url: config.root+'/upload-file',
+                                        url: '/wuliu/upload-file',
                                         type: 'POST',
                                         data: fd,
                                         cache: false,
@@ -312,7 +319,7 @@ function remove(){
                         loader: function (param, success, error) {
                             debugger
                             $.ajax({
-                                url: '../mess/area.json',
+                                url: '../other/area.json',
                                 type: 'get',
                                 data: {},
                                 success: function (data) {
@@ -388,6 +395,7 @@ function remove(){
                                 debugger
                                 $('#area2Id')[0]['area'+ss[i].code]=ss[i].children
                             }
+                            
                             success({rows:ss?ss:[]});
                         },
                         onChange:function(newValue, oldValue){
@@ -479,6 +487,62 @@ function remove(){
                         }" style="width:200px"></td>
                 </tr>
                 <tr>
+                    <td>类型&nbsp;</td>
+                    <td>
+                        <select id="type1" style="vertical-align: top;cursor:pointer;font-size:16px;height: 24px;" 
+                            onchange="
+                                $('#type2').html('')
+                                var selectedOption = $('#type1 option:selected');
+                                var sons = project.goodsTypes['idSons'+selectedOption.val()]
+
+                                $('#type2').append('<option></option>')
+                                for (let index = 0; sons && index < sons.length; index++) {
+                                    const element = sons[index];
+                                    var option = $('<option value='+element.id+'>'+element.name+'</option>')
+                                    option[0].sons=element.sons
+                                    $('#type2').append(option)
+                                }
+                                
+                            ">
+
+                        </select>
+                        <script>
+                            if($('#type1 option').length==0){
+                                $('#type1').append(`<option value=""></option>`)
+                                for (let index = 0; index < project.goodsTypes.length; index++) {
+                                    const element = project.goodsTypes[index];
+                                    var option = $(`<option value="${element.id}">${element.name}</option>`)
+                                    $('#type1').append(option)
+                                    project.goodsTypes['idSons'+element.id]=element.sons
+                                }
+                                var s = setInterval(() => {
+                                    if(!$('#type1')[0].value){
+                                        $('#type1')[0].value=item.type1Id
+                                        $('#type1').change()
+                                    }else{
+                                        clearInterval(s)
+                                    }
+                                }, 500);
+
+                                var s1 = setInterval(() => {
+                                    if(!$('#type2')[0].value){
+                                        $('#type2')[0].value=item.type2Id
+                                        $('#type2').change()
+                                    }else{
+                                        clearInterval(s1)
+                                    }
+                                }, 500);
+                            }
+                        </script>
+                        <select id="type2"  style="vertical-align: top;cursor:pointer;font-size:16px;height: 24px;" 
+                            onchange="
+                            
+                            ">
+
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td>简介&nbsp;</td>
                     <td><input id="intro" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
                             value:item.intro,
@@ -489,11 +553,33 @@ function remove(){
                 </tr>
                 
                 <tr>
-                    <td>内容&nbsp;</td>
+                    <td>详情&nbsp;</td>
                     <td><textarea id="content" style="width: 100%;height:500px;padding:1px 4px" placeholder="
                         图片自适应: 宽度: 100%, 高度: 空."></textarea></td>
                 </tr>
-
+                <tr>
+                    <td>单位&nbsp;</td>
+                    <td><input id="unit" class="easyui-combobox" style="width:100%" data-options="
+                                    value:item.unit,
+                                    editable:false,panelHeight:'auto',
+                                    data:[ {
+                                        text: '件',
+                                        value: '1'
+                                    },{
+                                         text: '斤',
+                                         value: '2'
+                                     }],
+                                     iconWidth:20,
+                                     icons:[{
+                                         iconCls:'icon-clear',
+                                         handler: function(e){
+                                             $(e.data.target).combobox('setValue','');
+                                         }
+                                     }],
+                                     onChange:function(newValue, oldValue){
+                                        item.unit=newValue
+                                     }" /></td>
+                </tr>
                 <tr>
                     <td>浏览量&nbsp;</td>
                     <td>

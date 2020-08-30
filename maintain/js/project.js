@@ -26,17 +26,104 @@ project.newTab = function (param) {
 
 
 
-project.fengXianChengShou = function (value) {
+project.huoWuLeiXing = function (value) {
     debugger
     if(isNaN(value) || value ==null)
         return ''
-    if(value < 40)
-        return '低'
-    else if(40<= value && value < 60 )
-        return '中'
-    else if(60<= value && value < 79)
-        return '中高'
-    else if(80<=  value && value <= 100)
-        return '高'
+    if(value == 1)
+        return '服装'
+    else if(value == 2)
+        return '食品'
    return ''
 }
+
+project.baoZhuangFangShi = function (value) {
+    debugger
+    if(isNaN(value) || value ==null)
+        return ''
+    if(value == 1)
+        return '木箱'
+    else if(value == 2)
+        return '纸箱'
+   return ''
+}
+
+project.xiangXing = function (value) {
+    debugger
+    if(isNaN(value) || value ==null)
+        return ''
+    if(value == 1)
+        return '20小箱'
+    else if(value == 2)
+        return '40大箱'
+    else if(value == 3)
+        return '40高箱'
+    else if(value == 4)
+        return '45高箱'
+   return ''
+}
+
+project.gongNeng = function (value) {
+    debugger
+    if(isNaN(value) || value ==null)
+        return ''
+    if(value == 1)
+        return '普通'
+    else if(value == 2)
+        return '短板'
+    else if(value == 3)
+        return '短板自卸'
+    else if(value == 4)
+        return '冷柜'
+    else if(value == 5)
+        return '开顶'
+    else if(value == 6)
+        return '罐式'
+    else if(value == 7)
+        return '脚架折叠'
+    else if(value == 8)
+        return '板框折叠'
+    else if(value == 9)
+        return '挂衣'
+   return ''
+}
+
+project.xiangShuUnit = function (value) {
+    debugger
+    if(isNaN(value) || value ==null)
+        return ''
+    if(value == 1)
+        return '个'
+    else if(value == 2)
+        return '组'
+   return ''
+}
+
+project.goodsTypes = [
+    {
+        id:'1',
+        name:'服装',
+        sons:[
+            {
+                id:'11',
+                name:'服装11'
+            },{
+                id:'12',
+                name:'食品12'
+            }
+        ]
+    },{
+        id:'2',
+        name:'食品',
+        sons:[
+            {
+                id:'21',
+                name:'服装21'
+            },{
+                id:'22',
+                name:'食品22'
+            }
+        ]
+    }
+]
+

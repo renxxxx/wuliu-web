@@ -47,7 +47,7 @@
         })
 
         var qso = util.queryStringObject();
-        var queryParam = {}, currentItemList = [], sum = {}
+        var queryParam = {}, currentItems = [], sum = {}
 
         $(document).ready(function(){
             
@@ -55,7 +55,7 @@
                 columns: [[
                    
                     {
-                        field: 'userId', title: '用户', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                        field: 'userId', title: '用户', width: 250, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<span style="width:100%;display:inline-block;" title="${row.userNickname||''}${row.userPhone?(' / '+row.userPhone):''}" 
                                         >${row.userNickname||''}${row.userPhone?(' / '+row.userPhone):''}
                                     </span>`;
@@ -97,7 +97,7 @@
                     {
                         field: 'orderId', title: '订单Id', width: 300, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
-                                        onclick="project.newTab({title:'订单信息:${value.substring(0, 10) + '...'}',url:'./order-info.html?orderId=${row.orderId}'})"
+                                        onclick="project.newTab({title:'订单信息:${'...'+ value.split("").reverse().join("").substring(0, 6).split("").reverse().join("")}',url:'./order-info.html?orderId=${row.orderId}'})"
                                     >${value}
                                     </a>`;
                         }, styler: function (value, row, index) {
@@ -128,17 +128,17 @@
                     queryParam.pn = param.page;
                     queryParam.sort = param.sort;
                     queryParam.order = param.order;
-                    $.get(config.root+'/maintain/order-manage/order-list', queryParam, function (data) {
+                    $.get('/wuliu/maintain/order-manage/orders', queryParam, function (data) {
                         if (data.codeMsg)
                             $.messager.alert('提示',data.codeMsg);
                         if (data.code == 0) {
-                            currentItemList = data.data.itemList;
-                            $.get(config.root+'/maintain/order-manage/order-list-sum', queryParam, function (data) {
+                            currentItems = data.data.items;
+                            $.get('/wuliu/maintain/order-manage/orders-sum', queryParam, function (data) {
                                 if (data.codeMsg)
                                     $.messager.alert('提示',data.codeMsg);
                                 if (data.code == 0) {
                                     sum = data.data;
-                                    success({rows:currentItemList,total:sum.itemCount});
+                                    success({rows:currentItems,total:sum.itemCount});
                                 }
                             })
                         } else {
@@ -248,7 +248,7 @@
                     loader: function (param, success, error) {
                         debugger
                         $.ajax({
-                            url: '../mess/area.json',
+                            url: '../other/area.json',
                             type: 'get',
                             data: {},
                             success: function (data) {
@@ -461,7 +461,7 @@
                         if(r)
                             $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/wx-videoaccount/delete-wx-videoaccount-list',
+                            url: '/wuliu/maintain/wx-videoaccount/delete-wx-videoaccount-list',
                             data: $.extend({},queryParam,{wxVideoaccountId:ids.length==0?null:ids.join(),expectedItemCount:ids.length==0?sum.itemCount:ids.length}),
                             success: function (res) {
                                 debugger

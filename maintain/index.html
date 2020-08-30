@@ -48,7 +48,7 @@
 
         var login
         $(document).ready(function(){
-            $.post(config.root+'/login-refresh',function(res){                
+            $.post('/wuliu/login-refresh',function(res){                
                 if(res.code==0){
                     login = res.data;
                     $('#nickname').text(login.nickname)

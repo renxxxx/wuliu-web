@@ -89,7 +89,7 @@
             <div style="text-align:center;padding:5px">
                 <a name="loginEnter" href="javascript:void(0)" class="easyui-linkbutton" style="width:150px;" 
                     onclick="
-                        $.post(config.root+'/login',{account:$('#passwordLoginTag [name=account]').val(),password:$('#passwordLoginTag [name=password]').val()},function(res){
+                        $.post('/wuliu/login',{account:$('#passwordLoginTag [name=account]').val(),password:$('#passwordLoginTag [name=password]').val()},function(res){
                             if(res.codeMsg)
                                 $.messager.alert('提示',res.codeMsg);
                             if(res.code==0){
@@ -128,7 +128,7 @@
                             <input name="vcode" class="easyui-textbox" type="text" style="width:250px;"></input>
                             <a href="javascript:void(0)" class="easyui-linkbutton" style="width:45px;"
                                 onclick="
-                                    $.post(config.root+'/send-sms-vcode',{phone:$('#smsLoginTag [name=phone]').val(),password:$('#smsLoginTag [name=vcode]').val()},function(res){
+                                    $.post('/wuliu/send-sms-vcode',{phone:$('#smsLoginTag [name=phone]').val(),password:$('#smsLoginTag [name=vcode]').val()},function(res){
                                         if(res.codeMsg)
                                             $.messager.alert('提示',res.codeMsg);
                                         if(res.code==0){
@@ -145,13 +145,13 @@
             <div style="text-align:center;padding:5px">
                 <a name="loginEnter" href="javascript:void(0)" class="easyui-linkbutton" style="width:150px;" 
                     onclick="
-                        $.post(config.root+'/login-by-sms',{phone:$('#smsLoginTag [name=phone]').val(),vcode:$('#smsLoginTag [name=vcode]').val()},function(res){
+                        $.post('/wuliu/login-by-sms',{phone:$('#smsLoginTag [name=phone]').val(),vcode:$('#smsLoginTag [name=vcode]').val()},function(res){
                             if(res.codeMsg)
                                 $.messager.alert('提示',res.codeMsg);
                             if(res.code==0){
                                 if(!res.codeMsg)
                                     layer.msg('登录成功');
-                                    $.post(config.root+'/login-refresh',function(res){
+                                    $.post('/wuliu/login-refresh',function(res){
                                         if(res.codeMsg)
                                             $.messager.alert('提示',res.codeMsg);
                                         if(res.code==0){

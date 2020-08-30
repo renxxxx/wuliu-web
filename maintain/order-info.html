@@ -46,12 +46,12 @@ var config = null;
     })
 
     var qso = util.queryStringObject();
-    qso.keFuPresetQuestionId;
+    qso.orderId;
     var item = {}
 
     $.ajax({
         type: 'get',
-        url: config.root+`/maintain/ke-fu-preset-question-manage/ke-fu-preset-question-info?keFuPresetQuestionId=${qso.keFuPresetQuestionId}`,
+        url: `/wuliu/maintain/order-manage/order-info?orderId=${qso.orderId}`,
         async: false,
         success: function (res) {
             debugger
@@ -71,146 +71,512 @@ var config = null;
         debugger
     })
 
-    function paperUpdate(){
-        debugger
-        $.messager.confirm('提示','确认修改吗?',function(r){
-            if(r){
-                $.ajax({
-                        type: 'post',
-                        url: config.root+'/maintain/ke-fu-preset-question-manage/ke-fu-preset-question-update',
-                        data: item,
-                        success: function (res) {
-                            debugger
-                            if (res.codeMsg)
-                                $.messager.alert('提示',res.codeMsg);
-                            if (res.code == 0) {
-                                if (!res.codeMsg)
-                                    $.messager.alert('提示','修改成功',null,function(){ location.reload()});
-                            } 
-                        }
-                    })
-            }
-        })
-    }
-             
-    function paperDelete(){
-        debugger
-        $.messager.confirm('提示','确认删除吗？', function(r){
-            if(r)
-            $.ajax({
-                type: 'post',
-                url: config.root+'/maintain/ke-fu-preset-question-manage/ke-fu-preset-question-list-delete',
-                data: {keFuPresetQuestionId:item.keFuPresetQuestionId,expectCount:1},
-                success: function (res) {
-                    debugger
-                    if (res.codeMsg)
-                        $.messager.alert('提示',res.codeMsg);
-                    if (res.code == 0) {
-                        if (!res.codeMsg)
-                            $.messager.alert('提示','删除成功',null,function(){ location.reload()});
-                    } 
-                }
-            })
-        });             
-    }
+  
              
         
 </script>
 
-<body style="margin:0;padding:0;">
+<body style="margin:0;padding:0;font-size:0px;">
     <img id="doingTag" src="./image/doing.gif" style="width:100%;height:5px;position: absolute;top:0;z-index: 999999;display:none;" />
-    <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'问卷详情'">
-        <thead>
-            <tr>
-                <th data-options="field:'name',width:200,align:'right'">属性&nbsp;</th>
-                <th data-options="field:'value',width:500">值</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>问题Id&nbsp;</td>
-                <td>
-                    <span id="keFuPresetQuestionId" style="margin-left:5px;"></span>
-                    <img src="./favicon.ico" onload="$('#keFuPresetQuestionId').text(item.keFuPresetQuestionId||'')" style="display:none;"/>
-                </td>
-            </tr>
-            <tr>
-                <td>问题&nbsp;</td>
-                <td>
-                    <input id="name" class="easyui-textbox" style="width:100%;height:200px;" 
-                        data-options="
-                            value:item.name,
-                            multiline:true,
-                            onChange:function(newValue, oldValue){
-                                item.name=newValue
-                            }
-                        "
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>回复&nbsp;</td>
-                <td>
-                    <input id="reply" class="easyui-textbox" style="width:100%;height:200px;" 
-                        data-options="
-                            value:item.reply,
-                            multiline:true,
-                            onChange:function(newValue, oldValue){
-                                item.reply=newValue
-                            }
-                        "
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>序号&nbsp;</td>
-                <td>
-                    <input id="orderNo" class="easyui-numberbox" style="width:100%" 
-                        data-options="
-                            value:item.orderNo,
-                            iconWidth:20,
-                            precision:2,
-                            icons:[{
-                                iconCls:'icon-clear',
-                                handler: function(e){
-                                    $(e.data.target).textbox('setValue','');
-                                }
-                            }],
-                            onChange:function(newValue, oldValue){
-                                item.orderNo=newValue
-                            }
-                        " 
-                    />
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div id="datagridFoot" style="padding:2px 5px;">
-        <a id="update" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-edit"  plain="true"
-            onclick="$('#update,#remove,#reload,#updatePasswordPageEntrance,#freeze,#unfreeze').hide();$('#updateConfirm,#updateCancel').show()"
-            >修改
-        </a>
-        <a id="updateConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-ok"  plain="true" 
-            onclick="paperUpdate()"
-            >确认
-        </a>
-        <a id="updateCancel" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-cancel"  plain="true" 
-            onclick="location.reload()"
-            >取消
-        </a>
-        <a id="remove" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-remove"  plain="true" 
-            onclick="paperDelete()"
-            >删除
-        </a>
-        <a id="reload" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" 
-            onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})"
-            >刷新
-        </a>
+    <div id="orderIdPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            订单Id</span>
+        <span id="orderId" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#orderId').text(item.orderId||'')" style="display:none;"/>
     </div>
-        
+
+    <div id="userPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            用户
+        </span>
+        <span style="display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+            <a id="user" href="javascript:void(0);" style="font-size:16px;"
+                onclick="
+                    project.newTab({title:'用户信息:'+item.userNickname.substring(0, 10) + '...',url:'./user-info.html?userId='+item.userId})">
+            </a>
+        </span>
+        <img src="./favicon.ico" onload="$('#user').text([item.userNickname,item.userPhone].join().replace(/,/g,' / '))" style="display:none;"/>
+    </div>
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="faHuoAreaPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span  
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            发货地</span>
+        <span id="faHuoArea" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#faHuoArea').text([item.faHuoArea1Name,item.faHuoArea2Name,item.faHuoArea3Name].join().replace(/,/g,' / '))" style="display:none;"/>
+    </div>
+    <div id="faHuoAddressPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            详细地址</span>
+        <span id="faHuoAddress" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#faHuoAddress').text(item.faHuoAddress)" style="display:none;"/>
+    </div>
+    <div id="faHuoTimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            发货时间</span>
+        <span id="faHuoTime" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#faHuoTime').text(moment(item.faHuoTime).format('YYYY-MM-DD H:mm:ss'))" style="display:none;"/>
+    </div>
+    <div id="shouHuoPad">
+        <img src="./favicon.ico" onload="item.shouHuoArea1Name?$('#shouHuoPad').show():$('#shouHuoPad').hide()" style="display:none;"/>
+        <div style="height:10px;background-color: #e6e6e6;"></div>
+        <div id="shouHuoAreaPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span  
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货地1</span>
+            <span id="shouHuoArea" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuoArea').text(item.shouHuoArea1Name?[item.shouHuoArea1Name,item.shouHuoArea2Name,item.shouHuoArea3Name].join().replace(/,/g,' / '):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuoAddressPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                详细地址</span>
+            <span id="shouHuoAddress" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuoAddress').text(item.shouHuoAddress||'')" style="display:none;"/>
+        </div>
+        <div id="shouHuoTimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货时间</span>
+            <span id="shouHuoTime" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuoTime').text(item.shouHuoTime?moment(item.shouHuoTime).format('YYYY-MM-DD H:mm:ss'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuoWeightPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                重量</span>
+            <span id="shouHuoWeight" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuoWeight').text(item.shouHuoWeight?(item.shouHuoWeight+' kg'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuoVolumePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                体积</span>
+            <span id="shouHuoVolume" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuoVolume').text(item.shouHuoVolume?(item.shouHuoVolume+' m³'):'')" style="display:none;"/>
+        </div>
+    </div>
+
+    <div id="shouHuo1Pad">
+        <img src="./favicon.ico" onload="item.shouHuo1Area1Name?$('#shouHuo1Pad').show():$('#shouHuo1Pad').hide()" style="display:none;"/>
+        <div style="height:10px;background-color: #e6e6e6;"></div>
+        <div id="shouHuo1AreaPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span  
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货地2</span>
+            <span id="shouHuo1Area" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo1Area').text(item.shouHuo1Area1Name?[item.shouHuo1Area1Name,item.shouHuo1Area2Name,item.shouHuo1Area3Name].join().replace(/,/g,' / '):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo1AddressPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                详细地址</span>
+            <span id="shouHuo1Address" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo1Address').text(item.shouHuo1Address||'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo1TimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货时间</span>
+            <span id="shouHuo1Time" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo1Time').text(item.shouHuo1Time?moment(item.shouHuo1Time).format('YYYY-MM-DD H:mm:ss'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo1WeightPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                重量</span>
+            <span id="shouHuo1Weight" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo1Weight').text(item.shouHuo1Weight?(item.shouHuo1Weight+' kg'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo1VolumePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                体积</span>
+            <span id="shouHuo1Volume" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo1Volume').text(item.shouHuo1Volume?(item.shouHuo1Volume+' m³'):'')" style="display:none;"/>
+        </div>
+    </div>
+
+    <div id="shouHuo2Pad">
+        <img src="./favicon.ico" onload="item.shouHuo2Area1Name?$('#shouHuo2Pad').show():$('#shouHuo2Pad').hide()" style="display:none;"/>
+        <div style="height:10px;background-color: #e6e6e6;"></div>
+        <div id="shouHuo2AreaPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span  
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货地3</span>
+            <span id="shouHuo2Area" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo2Area').text(item.shouHuo2Area1Name?[item.shouHuo2Area1Name,item.shouHuo2Area2Name,item.shouHuo2Area3Name].join().replace(/,/g,' / '):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo2AddressPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                详细地址</span>
+            <span id="shouHuo2Address" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo2Address').text(item.shouHuo2Address||'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo2TimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货时间</span>
+            <span id="shouHuo2Time" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo2Time').text(item.shouHuo2Time?moment(item.shouHuo2Time).format('YYYY-MM-DD H:mm:ss'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo2WeightPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                重量</span>
+            <span id="shouHuo2Weight" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo2Weight').text(item.shouHuo2Weight?(item.shouHuo2Weight+' kg'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo2VolumePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                体积</span>
+            <span id="shouHuo2Volume" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo2Volume').text(item.shouHuo2Volume?(item.shouHuo2Volume+' m³'):'')" style="display:none;"/>
+        </div>
+    </div>
+
+    <div id="shouHuo3Pad">
+        <img src="./favicon.ico" onload="item.shouHuo3Area1Name?$('#shouHuo3Pad').show():$('#shouHuo3Pad').hide()" style="display:none;"/>
+        <div style="height:10px;background-color: #e6e6e6;"></div>
+        <div id="shouHuo3AreaPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span  
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货地4</span>
+            <span id="shouHuo3Area" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo3Area').text(item.shouHuo3Area1Name?[item.shouHuo3Area1Name,item.shouHuo3Area2Name,item.shouHuo3Area3Name].join().replace(/,/g,' / '):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo3AddressPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                详细地址</span>
+            <span id="shouHuo3Address" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo3Address').text(item.shouHuo3Address||'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo3TimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                收货时间</span>
+            <span id="shouHuo3Time" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo3Time').text(item.shouHuo3Time?moment(item.shouHuo3Time).format('YYYY-MM-DD H:mm:ss'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo3WeightPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                重量</span>
+            <span id="shouHuo3Weight" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo3Weight').text(item.shouHuo3Weight?(item.shouHuo3Weight+' kg'):'')" style="display:none;"/>
+        </div>
+        <div id="shouHuo3VolumePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+            <span 
+                style="
+                    font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                    border-right:1px solid #e6e6e6;word-break:break-all;">
+                体积</span>
+            <span id="shouHuo3Volume" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+            <img src="./favicon.ico" onload="$('#shouHuo3Volume').text(item.shouHuo3Volume?(item.shouHuo3Volume+' m³'):'')" style="display:none;"/>
+        </div>
+    </div>
+
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="huoWuLeiXingPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            货物类型</span>
+        <span id="huoWuLeiXing" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#huoWuLeiXing').text(project.huoWuLeiXing(item.huoWuLeiXing))" style="display:none;"/>
+    </div>
+    <div id="huoWuWeightPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            重量</span>
+        <span id="huoWuWeight" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#huoWuWeight').text(item.huoWuWeight?(item.huoWuWeight+' kg'):'')" style="display:none;"/>
+    </div>
+    <div id="huoWuVolumePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            体积</span>
+        <span id="huoWuVolume" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#huoWuVolume').text(item.huoWuVolume?(item.huoWuVolume+' m³'):'')" style="display:none;"/>
+    </div>
+    <div id="baoZhuangFangShiPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            包装</span>
+        <span id="baoZhuangFangShi" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#baoZhuangFangShi').text(project.baoZhuangFangShi(item.baoZhuangFangShi))" style="display:none;"/>
+    </div>
+    <div id="xiangXingPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            箱型</span>
+        <span id="xiangXing" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#xiangXing').text(project.xiangXing(item.xiangXing))" style="display:none;"/>
+    </div>
+    <div id="gongNengPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            功能</span>
+        <span id="gongNeng" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#gongNeng').text(project.gongNeng(item.gongNeng))" style="display:none;"/>
+    </div>
+    <div id="xiangShuPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            箱数</span>
+        <span id="xiangShu" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#xiangShu').text(item.xiangShu?(item.xiangShu+project.xiangShuUnit(item.xiangShuUnit)):'')" style="display:none;"/>
+    </div>
+
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="pingJiaScorePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            评分</span>
+        <span id="pingJiaScore" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#pingJiaScore').text(item.pingJiaScore?(item.pingJiaScore):'')" style="display:none;"/>
+    </div>
+    <div id="pingJiaContentPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            评价</span>
+        <span id="pingJiaContent" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#pingJiaContent').text(item.pingJiaContent?(item.pingJiaContent):'')" style="display:none;"/>
+    </div>
+
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="notePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            备注</span>
+        <span id="note" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#note').text(item.note?(item.note):'')" style="display:none;"/>
+    </div>
+    <div id="orderNoPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            排序号</span>
+        <span id="orderNo" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#orderNo').text(item.orderNo?(item.orderNo):'')" style="display:none;"/>
+    </div>
+    <div id="insertTimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            创建时间</span>
+        <span id="insertTime" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#insertTime').text(item.insertTime?moment(item.insertTime).format('YYYY-MM-DD H:mm:ss'):'')" style="display:none;"/>
+    </div>
+
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="baoJiaUserPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            选择的报价</span>
+        <span id="baoJiaUser" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#baoJiaUser').text(item.baoJiaUserNickname||'')" style="display:none;"/>
+    </div>
+    <div id="baoJiaPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <div 
+            style="
+                font-size:16px;padding:3px 3px;background-color: #ccc9c9;font-weight: 900;border-bottom:1px solid #e6e6e6;">
+            报价
+        </div>
+        <ul id="baoJiaItemsPad" style="padding:0;border-bottom:1px solid #e6e6e6;overflow: auto;white-space: nowrap;" >
+            <li>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:250px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">用户</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">报价时间</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">中远</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">装船</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">到港</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">中谷</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">装船</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">到港</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">信风</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">装船</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">到港</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">安通</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">装船</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;background-color: #ccc9c9;">到港</span>
+                <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;text-align: center;background-color: #ccc9c9;">操作</span>
+            </li>
+            <div style="max-height:100px;">
+                <li id="templateBaoJiaItem" style="display:none;">
+                    <span style="border-bottom:1px solid #e6e6e6;line-height:30px;height:30px;padding:0 3px;display: inline-block;width:250px;border-right:1px solid #e6e6e6;">
+                        <a class="user" style="font-size: 16px;" href="javascript:void(0)"></a>
+                    </span>
+                    <span class="time" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="zhongYuanMoney" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;"></span>
+                    <span class="zhongYuanZhuangChuanTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="zhongYuanDaoGangTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="zhongGuMoney" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;"></span>
+                    <span class="zhongGuZhuangChuanTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="zhongGuDaoGangTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="xinFengMoney" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;"></span>
+                    <span class="xinFengZhuangChuanTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="xinFengDaoGangTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="anTongMoney" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;border-right:1px solid #e6e6e6;"></span>
+                    <span class="anTongZhuangChuanTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="anTongDaoGangTime" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:180px;border-right:1px solid #e6e6e6;text-align: center;"></span>
+                    <span class="operate" style="border-bottom:1px solid #e6e6e6;vertical-align: top;line-height:30px;height:30px;padding:0 3px;display: inline-block;font-size: 16px;width:100px;"></span>
+                </li>
+            </div>
+            <div class="noData" style="font-size: 16px;text-align: center;color:#e6e6e6;display:none;margin:3px 0;">无数据</div>
+            <div class="noMoreData" style="font-size: 14px;text-align: center;color:#e6e6e6;display:none;margin:3px 0;">已加载完成</div>
+        </ul>
+        <div style="background-color: #ccc9c9;"><span class="totalItemCount" style="font-size: 16px;padding:3px 3px;"></span></div>
+        <script>
+            debugger
+            $.ajax({
+                url:`/wuliu/maintain/order-manage/bao-jias?pn=1&ps=200&orderId=${qso.orderId}`,
+                success:function(res){
+                    if (res.codeMsg)
+                        layer.msg(res.codeMsg);
+                    if (res.code == 0) {
+                        var baoJiaItems = res.data.items;
+                        if(baoJiaItems.length > 0){
+                            $('#baoJiaItemsPad .noMoreData').show()
+                        }else{
+                            $('#baoJiaItemsPad .noData').show()
+                        }
+                        $('#baoJiaPad .totalItemCount').text(`共${baoJiaItems.length}条数据`)
+                        for (let index = 0; index < baoJiaItems.length; index++) {
+                            const element = baoJiaItems[index];
+                            var newBaoJiaItem = $('#templateBaoJiaItem').clone(true)
+                            $('#templateBaoJiaItem').before(newBaoJiaItem.attr('id','baoJiaItem'+element.id).show())
+
+                            newBaoJiaItem.find('.user').text([element.userNickname,element.userPhone].join().replace(/,/g,' / '))
+                            newBaoJiaItem.find('.time').text(element.insertTime?moment(element.insertTime).format('YYYY-MM-DD H:mm:ss'):'')
+
+                            newBaoJiaItem.find('.zhongYuanMoney').text(element.zhongYuanMoney)
+                            newBaoJiaItem.find('.zhongYuanZhuangChuanTime').text(element.zhongYuanZhuangChuanTime?moment(element.zhongYuanZhuangChuanTime).format('YYYY-MM-DD H:mm:ss'):'')
+                            newBaoJiaItem.find('.zhongYuanDaoGangTime').text(element.zhongYuanDaoGangTime?moment(element.zhongYuanDaoGangTime).format('YYYY-MM-DD H:mm:ss'):'')
+
+                            newBaoJiaItem.find('.zhongGuMoney').text(element.zhongGuMoney)
+                            newBaoJiaItem.find('.zhongGuZhuangChuanTime').text(element.zhongGuZhuangChuanTime?moment(element.zhongGuZhuangChuanTime).format('YYYY-MM-DD H:mm:ss'):'')
+                            newBaoJiaItem.find('.zhongGuDaoGangTime').text(element.zhongGuDaoGangTime?moment(element.zhongGuDaoGangTime).format('YYYY-MM-DD H:mm:ss'):'')
+
+                            newBaoJiaItem.find('.xinFengMoney').text(element.xinFengMoney)
+                            newBaoJiaItem.find('.xinFengZhuangChuanTime').text(element.xinFengZhuangChuanTime?moment(element.xinFengZhuangChuanTime).format('YYYY-MM-DD H:mm:ss'):'')
+                            newBaoJiaItem.find('.xinFengDaoGangTime').text(element.xinFengDaoGangTime?moment(element.xinFengDaoGangTime).format('YYYY-MM-DD H:mm:ss'):'')
+
+                            newBaoJiaItem.find('.anTongMoney').text(element.anTongMoney)
+                            newBaoJiaItem.find('.anTongZhuangChuanTime').text(element.anTongZhuangChuanTime?moment(element.anTongZhuangChuanTime).format('YYYY-MM-DD H:mm:ss'):'')
+                            newBaoJiaItem.find('.anTongDaoGangTime').text(element.anTongDaoGangTime?moment(element.anTongDaoGangTime).format('YYYY-MM-DD H:mm:ss'):'')
+                           
+                        }
+                    }
+                }
+            })
+           
+        </script>
+    </div>
+    <div id="operate" style="background-color: #e6e6e6;min-width:1000px;" >
+        <button style="cursor: pointer;margin:10px 0 10px 3px;font-size:20px;" onclick="location.reload()">刷新</button>
+        <button style="cursor: pointer;margin:10px 0 10px 15px;font-size:20px;" 
+            onclick="
+                $.messager.confirm('提示','确认删除吗？', function(r){
+                if(r)
+                $.ajax({
+                    type: 'post',
+                    url: '/wuliu/maintain/order-manage/orders-delete',
+                    data: {orderId:item.orderId},
+                    success: function (res) {
+                        debugger
+                        if (res.codeMsg)
+                            $.messager.alert('提示',res.codeMsg);
+                        if (res.code == 0) {
+                            if (!res.codeMsg)
+                                $.messager.alert('提示','删除成功',null,function(){ location.reload()});
+                        } 
+                    }
+                })
+            }); 
+            ">删除</button>
+    </div>
+    
+
 </body>
 <script>
-    $('#datagrid').datagrid()
+   
 </script>
 </html>

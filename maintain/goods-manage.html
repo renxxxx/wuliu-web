@@ -59,6 +59,20 @@
                         }
                     },
                     {
+                        field: 'area', title: '发货地', width: 200, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${row.area1Name||''}${row.area2Name?(' / '+row.area2Name):''}${row.area3Name?(' / '+row.area3Name):''}" 
+                                        >${row.area1Name||''}${row.area2Name?(' / '+row.area2Name):''}${row.area3Name?(' / '+row.area3Name):''}
+                                    </span>`;
+                        }
+                    },
+                    {
+                        field: 'type', title: '类型', width: 200, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${row.type1Name?[row.type1Name,row.type2Name].join().replace(/,/g,' / '):''}" 
+                                        >${row.type1Name?[row.type1Name,row.type2Name].join().replace(/,/g,' / '):''}
+                                    </span>`;
+                        }
+                    },
+                    {
                         field: 'viewCount', title: '浏览量', width: 100, align: 'right', halign: 'center', sortable: true,formatter: function (value, row, index) {
                             return `<span style="width:100%;display:inline-block;" title="${value||''}">${value||''}</span>`;
                         }
@@ -83,7 +97,7 @@
                 frozenColumns: [[
                     { field: 'ck', align: 'left', checkbox: true },
                     {
-                        field: 'name', title: '货物名称', width: 250, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                        field: 'name', title: '货物名称', width: 300, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
                                         onclick="project.newTab({title:'大货信息:${value.substring(0, 10) + '...'}',url:'./goods-info.html?goodsId=${row.goodsId}'})"
                                     >${value}
@@ -116,12 +130,12 @@
                     queryParam.pn = param.page;
                     queryParam.sort = param.sort;
                     queryParam.order = param.order;
-                    $.get(config.root+'/maintain/goods-manage/goodses', queryParam, function (data) {
+                    $.get('/wuliu/maintain/goods-manage/goodses', queryParam, function (data) {
                         if (data.codeMsg)
                             $.messager.alert('提示',data.codeMsg);
                         if (data.code == 0) {
                             currentItems = data.data.items;
-                            $.get(config.root+'/maintain/goods-manage/goodses-sum', queryParam, function (data) {
+                            $.get('/wuliu/maintain/goods-manage/goodses-sum', queryParam, function (data) {
                                 if (data.codeMsg)
                                     $.messager.alert('提示',data.codeMsg);
                                 if (data.code == 0) {
@@ -186,7 +200,7 @@
                     loader: function (param, success, error) {
                         debugger
                         $.ajax({
-                            url: '../mess/area.json',
+                            url: '../other/area.json',
                             type: 'get',
                             data: {},
                             success: function (data) {
@@ -399,7 +413,7 @@
                         if(r)
                             $.ajax({
                             type: 'post',
-                            url: config.root+'/maintain/wx-videoaccount/delete-wx-videoaccount-list',
+                            url: '/wuliu/maintain/wx-videoaccount/delete-wx-videoaccount-list',
                             data: $.extend({},queryParam,{wxVideoaccountId:ids.length==0?null:ids.join(),expectedItemCount:ids.length==0?sum.itemCount:ids.length}),
                             success: function (res) {
                                 debugger
