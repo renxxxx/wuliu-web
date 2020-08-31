@@ -62,16 +62,16 @@
                         }
                     },
                     {
-                        field: 'faHuoArea', title: '发货区域', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
-                            return `<span style="width:100%;display:inline-block;" title="${row.faHuoArea1Name||''}${row.faHuoArea2Name?(' / '+row.faHuoArea2Name):''}" 
-                                        >${row.faHuoArea1Name||''}${row.faHuoArea2Name?(' / '+row.faHuoArea2Name):''}
+                        field: 'faHuoArea', title: '发货地区', width: 200, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${[row.faHuoArea1Name,row.faHuoArea2Name,row.faHuoArea3Name].join().replace(/,/g,' / ')}" 
+                                        >${[row.faHuoArea1Name,row.faHuoArea2Name,row.faHuoArea3Name].join().replace(/,/g,' / ')}
                                     </span>`;
                         }
                     },
                     {
-                        field: 'shouHuoArea', title: '收货区域', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
-                            return `<span style="width:100%;display:inline-block;" title="${row.shouHuoArea1Name||''}${row.shouHuoArea2Name?(' / '+row.shouHuoArea2Name):''}" 
-                                        >${row.shouHuoArea1Name||''}${row.shouHuoArea2Name?(' / '+row.shouHuoArea2Name):''}
+                        field: 'shouHuoArea', title: '收货地区', width: 200, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${[row.shouHuoArea1Name,row.shouHuoArea2Name,row.shouHuoArea3Name].join().replace(/,/g,' / ')}" 
+                                        >${[row.shouHuoArea1Name,row.shouHuoArea2Name,row.shouHuoArea3Name].join().replace(/,/g,' / ')}
                                     </span>`;
                         }
                     },

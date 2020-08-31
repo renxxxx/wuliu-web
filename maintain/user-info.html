@@ -258,7 +258,7 @@ var config = null;
                 <td>
                     <div id="idCard">
                         <img style="display:none;" src="./favicon.ico" onload="$('#idCard-value').attr('src',item.idCard).parent().viewer({url: 'src',});if(item.idCard) $('#idCard-value').show();" />
-                        <img id="idCard-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","../image/image-error.png");' />
+                        <img id="idCard-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","./image/image-error.png");' />
                         <input type="file" style="display:none;" onchange="
                             javascript:
                             var target = this;
@@ -505,6 +505,172 @@ var config = null;
                                     item.maintainIs=newValue
                                  }" /></td>
             </tr>
+            <tr>
+                <td>运维地区</td>
+                <td><input id="maintainArea1Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.maintainArea1Id,
+                    text:item.maintainArea1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../other/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#maintainArea1Id')[0]['maintainArea'+data[i].code]=data[i].children
+                                }
+                                $('#maintainArea2Id').combobox('reload')
+
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.maintainArea1Id=newValue
+                        item.maintainArea1Name= $('#maintainArea1Id').combobox('getText')
+
+                        item.maintainArea2Id=null;
+                        item.maintainArea2Name=null;
+                        $('#maintainArea2Id').combobox('setText',null)
+                        $('#maintainArea2Id').combobox('setValue',null)
+
+                        item.maintainArea3Id=null;
+                        item.maintainArea3Name=null;
+                        $('#maintainArea3Id').combobox('setText',null)
+                        $('#maintainArea3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.maintainArea1Id=null;
+                            item.maintainArea1Name=null;
+                            $('#maintainArea1Id').combobox('setText',null)
+                            $('#maintainArea1Id').combobox('setValue',null)
+
+                            item.maintainArea2Id=null;
+                            item.maintainArea2Name=null;
+                            $('#maintainArea2Id').combobox('setText',null)
+                            $('#maintainArea2Id').combobox('setValue',null)
+
+                            item.maintainArea3Id=null;
+                            item.maintainArea3Name=null;
+                            $('#maintainArea3Id').combobox('setText',null)
+                            $('#maintainArea3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+                    <input id="maintainArea2Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.maintainArea2Id,
+                    text:item.maintainArea2Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#maintainArea1Id')[0]['maintainArea'+item.maintainArea1Id];
+                        for(var i=0;ss && i<ss.length;i++){
+                            debugger
+                            $('#maintainArea2Id')[0]['maintainArea'+ss[i].code]=ss[i].children
+                        }
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.maintainArea2Id=newValue
+                        item.maintainArea2Name= $('#maintainArea2Id').combobox('getText')
+
+                        item.maintainArea3Id=null;
+                        item.maintainArea3Name=null;
+                        $('#maintainArea3Id').combobox('setText',null)
+                        $('#maintainArea3Id').combobox('setValue',null)
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.maintainArea2Id=null;
+                            item.maintainArea2Name=null;
+                            $('#maintainArea2Id').combobox('setText',null)
+                            $('#maintainArea2Id').combobox('setValue',null)
+
+                            item.maintainArea3Id=null;
+                            item.maintainArea3Name=null;
+                            $('#maintainArea3Id').combobox('setText',null)
+                            $('#maintainArea3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+                    <input id="maintainArea3Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.maintainArea3Id,
+                    text:item.maintainArea3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#maintainArea2Id')[0]['maintainArea'+item.maintainArea2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.maintainArea3Id=newValue
+                        item.maintainArea3Name= $('#maintainArea3Id').combobox('getText')
+
+                       
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.maintainArea3Id=null;
+                            item.maintainArea3Name=null;
+                            $('#maintainArea3Id').combobox('setText',null)
+                            $('#maintainArea3Id').combobox('setValue',null)
+                        }
+                    }]
+                    "></td>
+            </tr>
+
+
              <tr>
                 <td>认证&nbsp;</td>
                 <td>
@@ -563,7 +729,7 @@ var config = null;
                 <td>
                     <div id="yingYeZhiZhao">
                         <img style="display:none;" src="./favicon.ico" onload="$('#yingYeZhiZhao-value').attr('src',item.yingYeZhiZhao).parent().viewer({url: 'src',});if(item.yingYeZhiZhao) $('#yingYeZhiZhao-value').show();" />
-                        <img id="yingYeZhiZhao-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","../image/image-error.png");' />
+                        <img id="yingYeZhiZhao-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","./image/image-error.png");' />
                         <input type="file" style="display:none;" onchange="
                             javascript:
                             var target = this;
@@ -689,6 +855,32 @@ var config = null;
         <a id="reload" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" 
             onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})"
             >刷新
+        </a>
+
+        <a id="reload" href="JavaScript:void(0)" class="easyui-linkbutton"   plain="true" 
+            onclick="
+                $.messager.prompt('修改密码', '请输入新密码', function (data)
+                {
+                    if (data)
+                    {
+                        $.ajax({
+                            type: 'post',
+                            url: '/wuliu/maintain/user-manage/set-password',
+                            data: {userId:item.userId,password:data},
+                            success: function (res) {
+                                debugger
+                                if (res.codeMsg)
+                                    $.messager.alert('提示',res.codeMsg);
+                                if (res.code == 0) {
+                                    if (!res.codeMsg)
+                                        $.messager.alert('提示','操作成功',null,function(){ location.reload()});
+                                } 
+                            }
+                        })
+                    }
+                });
+            "
+            >修改密码
         </a>
 
         <a id="renZhengPass" href="JavaScript:void(0)" class="easyui-linkbutton" style="" iconCls=""  plain="true" 

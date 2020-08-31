@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>集贤装-运维-订单信息</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./layer/layer.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+    <style></style>
+</head>
+
+<script>
+var config = null;
+    $.ajax({
+        url:'../config.json',
+        async:false,
+        success:function(res){
+            config=res;
+        }
+    })
+
+    layer.config({offset: '200px'});
+    $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        $('#doingTag').show();
+    });
+    $.ajaxSetup({
+        complete:function(){
+            $('#doingTag').hide();
+        },
+        error:function(xhr){
+            
+        }
+    })
+
+    var qso = util.queryStringObject();
+    qso.orderId;
+    var item = {}
+
+    $.ajax({
+        type: 'get',
+        url: `/wuliu/maintain/order-manage/order-info?orderId=${qso.orderId}`,
+        async: false,
+        success: function (res) {
+            debugger
+            if (res.codeMsg)
+                layer.msg(res.codeMsg);
+            if (res.code == 0) {
+                item = res.data;
+            }
+        }
+    })
+
+    $.parser.onComplete = function () {
+        debugger
+    }
+
+    $(document).ready(function(){
+        debugger
+    })
+
+    function paperUpdate(){
+        debugger
+        $.messager.confirm('提示','确认修改吗?',function(r){
+            if(r){
+                $.ajax({
+                        type: 'post',
+                        url: '/wuliu/maintain/order-manage/order-update',
+                        data: item,
+                        success: function (res) {
+                            debugger
+                            if (res.codeMsg)
+                                $.messager.alert('提示',res.codeMsg);
+                            if (res.code == 0) {
+                                if (!res.codeMsg)
+                                    $.messager.alert('提示','修改成功',null,function(){ location.reload()});
+                            } 
+                        }
+                    })
+            }
+        })
+    }
+             
+    function paperDelete(){
+        debugger
+        $.messager.confirm('提示','确认删除吗？', function(r){
+            if(r)
+            $.ajax({
+                type: 'post',
+                url: '/wuliu/maintain/order-manage/orders-delete',
+                data: {orderId:item.orderId,expectCount:1},
+                success: function (res) {
+                    debugger
+                    if (res.codeMsg)
+                        $.messager.alert('提示',res.codeMsg);
+                    if (res.code == 0) {
+                        if (!res.codeMsg)
+                            $.messager.alert('提示','删除成功',null,function(){ location.reload()});
+                    } 
+                }
+            })
+        });             
+    }
+             
+        
+</script>
+
+<body style="margin:0;padding:0;">
+    <img id="doingTag" src="./image/doing.gif" style="width:100%;height:5px;position: absolute;top:0;z-index: 999999;display:none;" />
+    <table id="datagrid"  data-options="singleSelect:true, footer: '#datagridFoot',title:'订单详情'">
+        <thead>
+            <tr>
+                <th data-options="field:'name',width:200,align:'right'">属性&nbsp;</th>
+                <th data-options="field:'value',width:500">值</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>订单Id&nbsp;</td>
+                <td>
+                    <span id="orderId" style="margin-left:5px;"></span>
+                    <img src="./favicon.ico" onload="$('#orderId').text(item.orderId||'')" style="display:none;"/>
+                </td>
+            </tr>
+            <tr>
+                <td>用户&nbsp;</td>
+                <td>
+                    <span style="margin-left:5px;"><a id="user" href="javascript:void(0);" onclick="
+                         project.newTab({title:'用户信息:'+item.userNickname.substring(0, 10) + '...',url:'./user-info.html?userId='+item.userId})   
+                        "></a></span>
+                    <img src="./favicon.ico" onload="$('#user').text([item.userNickname,item.userPhone].join().replace(/,/g,' / ') ||'')"  style="display:none;"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td>发货地</td>
+                <td><input id="faHuoArea1Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.faHuoArea1Id,
+                    text:item.faHuoArea1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../other/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#faHuoArea1Id')[0]['faHuoArea'+data[i].code]=data[i].children
+                                }
+                                $('#faHuoArea2Id').combobox('reload')
+
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.faHuoArea1Id=newValue
+                        item.faHuoArea1Name= $('#faHuoArea1Id').combobox('getText')
+
+                        item.faHuoArea2Id=null;
+                        item.faHuoArea2Name=null;
+                        $('#faHuoArea2Id').combobox('setText',null)
+                        $('#faHuoArea2Id').combobox('setValue',null)
+
+                        item.faHuoArea3Id=null;
+                        item.faHuoArea3Name=null;
+                        $('#faHuoArea3Id').combobox('setText',null)
+                        $('#faHuoArea3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.faHuoArea1Id=null;
+                            item.faHuoArea1Name=null;
+                            $('#faHuoArea1Id').combobox('setText',null)
+                            $('#faHuoArea1Id').combobox('setValue',null)
+
+                            item.faHuoArea2Id=null;
+                            item.faHuoArea2Name=null;
+                            $('#faHuoArea2Id').combobox('setText',null)
+                            $('#faHuoArea2Id').combobox('setValue',null)
+
+                            item.faHuoArea3Id=null;
+                            item.faHuoArea3Name=null;
+                            $('#faHuoArea3Id').combobox('setText',null)
+                            $('#faHuoArea3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+                    <input id="faHuoArea2Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.faHuoArea2Id,
+                    text:item.faHuoArea2Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#faHuoArea1Id')[0]['faHuoArea'+item.faHuoArea1Id];
+                        for(var i=0;ss && i<ss.length;i++){
+                            debugger
+                            $('#faHuoArea2Id')[0]['faHuoArea'+ss[i].code]=ss[i].children
+                        }
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.faHuoArea2Id=newValue
+                        item.faHuoArea2Name= $('#faHuoArea2Id').combobox('getText')
+
+                        item.faHuoArea3Id=null;
+                        item.faHuoArea3Name=null;
+                        $('#faHuoArea3Id').combobox('setText',null)
+                        $('#faHuoArea3Id').combobox('setValue',null)
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.faHuoArea2Id=null;
+                            item.faHuoArea2Name=null;
+                            $('#faHuoArea2Id').combobox('setText',null)
+                            $('#faHuoArea2Id').combobox('setValue',null)
+
+                            item.faHuoArea3Id=null;
+                            item.faHuoArea3Name=null;
+                            $('#faHuoArea3Id').combobox('setText',null)
+                            $('#faHuoArea3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+                    <input id="faHuoArea3Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.faHuoArea3Id,
+                    text:item.faHuoArea3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#faHuoArea2Id')[0]['faHuoArea'+item.faHuoArea2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.faHuoArea3Id=newValue
+                        item.faHuoArea3Name= $('#faHuoArea3Id').combobox('getText')
+
+                       
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.faHuoArea3Id=null;
+                            item.faHuoArea3Name=null;
+                            $('#faHuoArea3Id').combobox('setText',null)
+                            $('#faHuoArea3Id').combobox('setValue',null)
+                        }
+                    }]
+                    "></td>
+            </tr>
+            <tr>
+                <td>发货地址&nbsp;</td>
+                <td><input id="faHuoAddress" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.faHuoAddress,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.faHuoAddress=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
+                <td>发货时间&nbsp;</td>
+                <td>
+                    <input id="faHuoTime" class="easyui-datetimebox" style="width:100%" 
+                        data-options="
+                            value:moment(item.faHuoTime).format('YYYY-MM-DD H:mm:ss'),
+                            editable:false,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).datetimebox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.faHuoTime=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>收货1地</td>
+                <td><input id="shouHuo1Area1Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo1Area1Id,
+                    text:item.shouHuo1Area1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../other/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#shouHuo1Area1Id')[0]['shouHuo1Area'+data[i].code]=data[i].children
+                                }
+                                $('#shouHuo1Area2Id').combobox('reload')
+
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo1Area1Id=newValue
+                        item.shouHuo1Area1Name= $('#shouHuo1Area1Id').combobox('getText')
+
+                        item.shouHuo1Area2Id=null;
+                        item.shouHuo1Area2Name=null;
+                        $('#shouHuo1Area2Id').combobox('setText',null)
+                        $('#shouHuo1Area2Id').combobox('setValue',null)
+
+                        item.shouHuo1Area3Id=null;
+                        item.shouHuo1Area3Name=null;
+                        $('#shouHuo1Area3Id').combobox('setText',null)
+                        $('#shouHuo1Area3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo1Area1Id=null;
+                            item.shouHuo1Area1Name=null;
+                            $('#shouHuo1Area1Id').combobox('setText',null)
+                            $('#shouHuo1Area1Id').combobox('setValue',null)
+
+                            item.shouHuo1Area2Id=null;
+                            item.shouHuo1Area2Name=null;
+                            $('#shouHuo1Area2Id').combobox('setText',null)
+                            $('#shouHuo1Area2Id').combobox('setValue',null)
+
+                            item.shouHuo1Area3Id=null;
+                            item.shouHuo1Area3Name=null;
+                            $('#shouHuo1Area3Id').combobox('setText',null)
+                            $('#shouHuo1Area3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo1Area2Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo1Area2Id,
+                    text:item.shouHuo1Area2Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo1Area1Id')[0]['shouHuo1Area'+item.shouHuo1Area1Id];
+                        for(var i=0;ss && i<ss.length;i++){
+                            debugger
+                            $('#shouHuo1Area2Id')[0]['shouHuo1Area'+ss[i].code]=ss[i].children
+                        }
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo1Area2Id=newValue
+                        item.shouHuo1Area2Name= $('#shouHuo1Area2Id').combobox('getText')
+
+                        item.shouHuo1Area3Id=null;
+                        item.shouHuo1Area3Name=null;
+                        $('#shouHuo1Area3Id').combobox('setText',null)
+                        $('#shouHuo1Area3Id').combobox('setValue',null)
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo1Area2Id=null;
+                            item.shouHuo1Area2Name=null;
+                            $('#shouHuo1Area2Id').combobox('setText',null)
+                            $('#shouHuo1Area2Id').combobox('setValue',null)
+
+                            item.shouHuo1Area3Id=null;
+                            item.shouHuo1Area3Name=null;
+                            $('#shouHuo1Area3Id').combobox('setText',null)
+                            $('#shouHuo1Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo1Area3Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo1Area3Id,
+                    text:item.shouHuo1Area3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo1Area2Id')[0]['shouHuo1Area'+item.shouHuo1Area2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo1Area3Id=newValue
+                        item.shouHuo1Area3Name= $('#shouHuo1Area3Id').combobox('getText')
+
+                       
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo1Area3Id=null;
+                            item.shouHuo1Area3Name=null;
+                            $('#shouHuo1Area3Id').combobox('setText',null)
+                            $('#shouHuo1Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    "></td>
+            </tr>
+            <tr>
+                <td>收货1地址&nbsp;</td>
+                <td><input id="shouHuo1Address" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.shouHuo1Address,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.shouHuo1Address=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
+                <td>收货1时间&nbsp;</td>
+                <td>
+                    <input id="faHuoTime" class="easyui-datetimebox" style="width:100%" 
+                        data-options="
+                            value:moment(item.faHuoTime).format('YYYY-MM-DD H:mm:ss'),
+                            editable:false,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).datetimebox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.faHuoTime=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>收货1重量/kg&nbsp;</td>
+                <td>
+                    <input id="shouHuo1Weight" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo1Weight,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo1Weight=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>收货1体积/m3&nbsp;</td>
+                <td>
+                    <input id="shouHuo1Volume" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo1Volume,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo1Volume=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>收货2地</td>
+                <td><input id="shouHuo2Area1Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo2Area1Id,
+                    text:item.shouHuo2Area1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../other/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#shouHuo2Area1Id')[0]['shouHuo2Area'+data[i].code]=data[i].children
+                                }
+                                $('#shouHuo2Area2Id').combobox('reload')
+
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo2Area1Id=newValue
+                        item.shouHuo2Area1Name= $('#shouHuo2Area1Id').combobox('getText')
+
+                        item.shouHuo2Area2Id=null;
+                        item.shouHuo2Area2Name=null;
+                        $('#shouHuo2Area2Id').combobox('setText',null)
+                        $('#shouHuo2Area2Id').combobox('setValue',null)
+
+                        item.shouHuo2Area3Id=null;
+                        item.shouHuo2Area3Name=null;
+                        $('#shouHuo2Area3Id').combobox('setText',null)
+                        $('#shouHuo2Area3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo2Area1Id=null;
+                            item.shouHuo2Area1Name=null;
+                            $('#shouHuo2Area1Id').combobox('setText',null)
+                            $('#shouHuo2Area1Id').combobox('setValue',null)
+
+                            item.shouHuo2Area2Id=null;
+                            item.shouHuo2Area2Name=null;
+                            $('#shouHuo2Area2Id').combobox('setText',null)
+                            $('#shouHuo2Area2Id').combobox('setValue',null)
+
+                            item.shouHuo2Area3Id=null;
+                            item.shouHuo2Area3Name=null;
+                            $('#shouHuo2Area3Id').combobox('setText',null)
+                            $('#shouHuo2Area3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo2Area2Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo2Area2Id,
+                    text:item.shouHuo2Area2Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo2Area1Id')[0]['shouHuo2Area'+item.shouHuo2Area1Id];
+                        for(var i=0;ss && i<ss.length;i++){
+                            debugger
+                            $('#shouHuo2Area2Id')[0]['shouHuo2Area'+ss[i].code]=ss[i].children
+                        }
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo2Area2Id=newValue
+                        item.shouHuo2Area2Name= $('#shouHuo2Area2Id').combobox('getText')
+
+                        item.shouHuo2Area3Id=null;
+                        item.shouHuo2Area3Name=null;
+                        $('#shouHuo2Area3Id').combobox('setText',null)
+                        $('#shouHuo2Area3Id').combobox('setValue',null)
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo2Area2Id=null;
+                            item.shouHuo2Area2Name=null;
+                            $('#shouHuo2Area2Id').combobox('setText',null)
+                            $('#shouHuo2Area2Id').combobox('setValue',null)
+
+                            item.shouHuo2Area3Id=null;
+                            item.shouHuo2Area3Name=null;
+                            $('#shouHuo2Area3Id').combobox('setText',null)
+                            $('#shouHuo2Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo2Area3Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo2Area3Id,
+                    text:item.shouHuo2Area3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo2Area2Id')[0]['shouHuo2Area'+item.shouHuo2Area2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo2Area3Id=newValue
+                        item.shouHuo2Area3Name= $('#shouHuo2Area3Id').combobox('getText')
+
+                       
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo2Area3Id=null;
+                            item.shouHuo2Area3Name=null;
+                            $('#shouHuo2Area3Id').combobox('setText',null)
+                            $('#shouHuo2Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    "></td>
+            </tr>
+            <tr>
+                <td>收货2地址&nbsp;</td>
+                <td><input id="shouHuo2Address" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.shouHuo2Address,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.shouHuo2Address=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
+                <td>收货2时间&nbsp;</td>
+                <td>
+                    <input id="faHuoTime" class="easyui-datetimebox" style="width:100%" 
+                        data-options="
+                            value:moment(item.faHuoTime).format('YYYY-MM-DD H:mm:ss'),
+                            editable:false,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).datetimebox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.faHuoTime=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>收货2重量/kg&nbsp;</td>
+                <td>
+                    <input id="shouHuo2Weight" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo2Weight,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo2Weight=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>收货2体积/m3&nbsp;</td>
+                <td>
+                    <input id="shouHuo2Volume" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo2Volume,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo2Volume=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>收货3地</td>
+                <td><input id="shouHuo3Area1Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo3Area1Id,
+                    text:item.shouHuo3Area1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../other/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#shouHuo3Area1Id')[0]['shouHuo3Area'+data[i].code]=data[i].children
+                                }
+                                $('#shouHuo3Area2Id').combobox('reload')
+
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo3Area1Id=newValue
+                        item.shouHuo3Area1Name= $('#shouHuo3Area1Id').combobox('getText')
+
+                        item.shouHuo3Area2Id=null;
+                        item.shouHuo3Area2Name=null;
+                        $('#shouHuo3Area2Id').combobox('setText',null)
+                        $('#shouHuo3Area2Id').combobox('setValue',null)
+
+                        item.shouHuo3Area3Id=null;
+                        item.shouHuo3Area3Name=null;
+                        $('#shouHuo3Area3Id').combobox('setText',null)
+                        $('#shouHuo3Area3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo3Area1Id=null;
+                            item.shouHuo3Area1Name=null;
+                            $('#shouHuo3Area1Id').combobox('setText',null)
+                            $('#shouHuo3Area1Id').combobox('setValue',null)
+
+                            item.shouHuo3Area2Id=null;
+                            item.shouHuo3Area2Name=null;
+                            $('#shouHuo3Area2Id').combobox('setText',null)
+                            $('#shouHuo3Area2Id').combobox('setValue',null)
+
+                            item.shouHuo3Area3Id=null;
+                            item.shouHuo3Area3Name=null;
+                            $('#shouHuo3Area3Id').combobox('setText',null)
+                            $('#shouHuo3Area3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo3Area2Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo3Area2Id,
+                    text:item.shouHuo3Area2Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo3Area1Id')[0]['shouHuo3Area'+item.shouHuo3Area1Id];
+                        for(var i=0;ss && i<ss.length;i++){
+                            debugger
+                            $('#shouHuo3Area2Id')[0]['shouHuo3Area'+ss[i].code]=ss[i].children
+                        }
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo3Area2Id=newValue
+                        item.shouHuo3Area2Name= $('#shouHuo3Area2Id').combobox('getText')
+
+                        item.shouHuo3Area3Id=null;
+                        item.shouHuo3Area3Name=null;
+                        $('#shouHuo3Area3Id').combobox('setText',null)
+                        $('#shouHuo3Area3Id').combobox('setValue',null)
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo3Area2Id=null;
+                            item.shouHuo3Area2Name=null;
+                            $('#shouHuo3Area2Id').combobox('setText',null)
+                            $('#shouHuo3Area2Id').combobox('setValue',null)
+
+                            item.shouHuo3Area3Id=null;
+                            item.shouHuo3Area3Name=null;
+                            $('#shouHuo3Area3Id').combobox('setText',null)
+                            $('#shouHuo3Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo3Area3Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo3Area3Id,
+                    text:item.shouHuo3Area3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo3Area2Id')[0]['shouHuo3Area'+item.shouHuo3Area2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo3Area3Id=newValue
+                        item.shouHuo3Area3Name= $('#shouHuo3Area3Id').combobox('getText')
+
+                       
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo3Area3Id=null;
+                            item.shouHuo3Area3Name=null;
+                            $('#shouHuo3Area3Id').combobox('setText',null)
+                            $('#shouHuo3Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    "></td>
+            </tr>
+            <tr>
+                <td>收货3地址&nbsp;</td>
+                <td><input id="shouHuo3Address" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.shouHuo3Address,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.shouHuo3Address=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
+                <td>收货3时间&nbsp;</td>
+                <td>
+                    <input id="faHuoTime" class="easyui-datetimebox" style="width:100%" 
+                        data-options="
+                            value:moment(item.faHuoTime).format('YYYY-MM-DD H:mm:ss'),
+                            editable:false,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).datetimebox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.faHuoTime=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>收货3重量/kg&nbsp;</td>
+                <td>
+                    <input id="shouHuo3Weight" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo3Weight,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo3Weight=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>收货3体积/m3&nbsp;</td>
+                <td>
+                    <input id="shouHuo3Volume" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo3Volume,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo3Volume=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+
+             <tr>
+                <td>收货4地</td>
+                <td><input id="shouHuo4Area1Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo4Area1Id,
+                    text:item.shouHuo4Area1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../other/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#shouHuo4Area1Id')[0]['shouHuo4Area'+data[i].code]=data[i].children
+                                }
+                                $('#shouHuo4Area2Id').combobox('reload')
+
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo4Area1Id=newValue
+                        item.shouHuo4Area1Name= $('#shouHuo4Area1Id').combobox('getText')
+
+                        item.shouHuo4Area2Id=null;
+                        item.shouHuo4Area2Name=null;
+                        $('#shouHuo4Area2Id').combobox('setText',null)
+                        $('#shouHuo4Area2Id').combobox('setValue',null)
+
+                        item.shouHuo4Area3Id=null;
+                        item.shouHuo4Area3Name=null;
+                        $('#shouHuo4Area3Id').combobox('setText',null)
+                        $('#shouHuo4Area3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo4Area1Id=null;
+                            item.shouHuo4Area1Name=null;
+                            $('#shouHuo4Area1Id').combobox('setText',null)
+                            $('#shouHuo4Area1Id').combobox('setValue',null)
+
+                            item.shouHuo4Area2Id=null;
+                            item.shouHuo4Area2Name=null;
+                            $('#shouHuo4Area2Id').combobox('setText',null)
+                            $('#shouHuo4Area2Id').combobox('setValue',null)
+
+                            item.shouHuo4Area3Id=null;
+                            item.shouHuo4Area3Name=null;
+                            $('#shouHuo4Area3Id').combobox('setText',null)
+                            $('#shouHuo4Area3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo4Area2Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo4Area2Id,
+                    text:item.shouHuo4Area2Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo4Area1Id')[0]['shouHuo4Area'+item.shouHuo4Area1Id];
+                        for(var i=0;ss && i<ss.length;i++){
+                            debugger
+                            $('#shouHuo4Area2Id')[0]['shouHuo4Area'+ss[i].code]=ss[i].children
+                        }
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo4Area2Id=newValue
+                        item.shouHuo4Area2Name= $('#shouHuo4Area2Id').combobox('getText')
+
+                        item.shouHuo4Area3Id=null;
+                        item.shouHuo4Area3Name=null;
+                        $('#shouHuo4Area3Id').combobox('setText',null)
+                        $('#shouHuo4Area3Id').combobox('setValue',null)
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo4Area2Id=null;
+                            item.shouHuo4Area2Name=null;
+                            $('#shouHuo4Area2Id').combobox('setText',null)
+                            $('#shouHuo4Area2Id').combobox('setValue',null)
+
+                            item.shouHuo4Area3Id=null;
+                            item.shouHuo4Area3Name=null;
+                            $('#shouHuo4Area3Id').combobox('setText',null)
+                            $('#shouHuo4Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+                    <input id="shouHuo4Area3Id" class="easyui-combobox" style="width:130px;" data-options="
+                    value:item.shouHuo4Area3Id,
+                    text:item.shouHuo4Area3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#shouHuo4Area2Id')[0]['shouHuo4Area'+item.shouHuo4Area2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        item.shouHuo4Area3Id=newValue
+                        item.shouHuo4Area3Name= $('#shouHuo4Area3Id').combobox('getText')
+
+                       
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            item.shouHuo4Area3Id=null;
+                            item.shouHuo4Area3Name=null;
+                            $('#shouHuo4Area3Id').combobox('setText',null)
+                            $('#shouHuo4Area3Id').combobox('setValue',null)
+                        }
+                    }]
+                    "></td>
+            </tr>
+            <tr>
+                <td>收货4地址&nbsp;</td>
+                <td><input id="shouHuo4Address" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.shouHuo4Address,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.shouHuo4Address=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
+                <td>收货4时间&nbsp;</td>
+                <td>
+                    <input id="faHuoTime" class="easyui-datetimebox" style="width:100%" 
+                        data-options="
+                            value:moment(item.faHuoTime).format('YYYY-MM-DD H:mm:ss'),
+                            editable:false,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).datetimebox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.faHuoTime=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>收货4重量/kg&nbsp;</td>
+                <td>
+                    <input id="shouHuo4Weight" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo4Weight,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo4Weight=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>收货4体积/m3&nbsp;</td>
+                <td>
+                    <input id="shouHuo4Volume" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.shouHuo4Volume,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.shouHuo4Volume=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>货物类型&nbsp;</td>
+                <td><input id="huoWuLeiXing" class="easyui-combobox" style="width:100%" data-options="
+                                value:item.huoWuLeiXing,
+                                editable:false,panelHeight:'auto',
+                                data:[ {
+                                    text: '服装',
+                                    value: '1'
+                                },{
+                                     text: '食品',
+                                     value: '2'
+                                 }],
+                                 iconWidth:20,
+                                 icons:[{
+                                     iconCls:'icon-clear',
+                                     handler: function(e){
+                                         $(e.data.target).combobox('setValue','');
+                                     }
+                                 }],
+                                 onChange:function(newValue, oldValue){
+                                    item.huoWuLeiXing=newValue
+                                 }" /></td>
+            </tr>
+            
+
+            <tr>
+                <td>重量/kg&nbsp;</td>
+                <td>
+                    <input id="huoWuWeight" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.huoWuWeight,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.huoWuWeight=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>体积/m3&nbsp;</td>
+                <td>
+                    <input id="huoWuVolume" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.huoWuVolume,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.huoWuVolume=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>包装方式&nbsp;</td>
+                <td><input id="baoZhuangFangShi" class="easyui-combobox" style="width:100%" data-options="
+                                value:item.baoZhuangFangShi,
+                                editable:false,panelHeight:'auto',
+                                data:[ {
+                                    text: '木箱',
+                                    value: '1'
+                                },{
+                                     text: '纸箱',
+                                     value: '2'
+                                 }],
+                                 iconWidth:20,
+                                 icons:[{
+                                     iconCls:'icon-clear',
+                                     handler: function(e){
+                                         $(e.data.target).combobox('setValue','');
+                                     }
+                                 }],
+                                 onChange:function(newValue, oldValue){
+                                    item.baoZhuangFangShi=newValue
+                                 }" /></td>
+            </tr>
+
+            <tr>
+                <td>箱型&nbsp;</td>
+                <td><input id="xiangXing" class="easyui-combobox" style="width:100%" data-options="
+                                value:item.xiangXing,
+                                editable:false,panelHeight:'auto',
+                                data:[ {
+                                    text: '20小箱',
+                                    value: '1'
+                                },{
+                                     text: '40大箱',
+                                     value: '2'
+                                 },{
+                                    text: '40高箱',
+                                    value: '3'
+                                },{
+                                    text: '45高箱',
+                                    value: '4'
+                                }],
+                                 iconWidth:20,
+                                 icons:[{
+                                     iconCls:'icon-clear',
+                                     handler: function(e){
+                                         $(e.data.target).combobox('setValue','');
+                                     }
+                                 }],
+                                 onChange:function(newValue, oldValue){
+                                    item.xiangXing=newValue
+                                 }" /></td>
+            </tr>
+
+            <tr>
+                <td>功能&nbsp;</td>
+                <td><input id="xiangXing" class="easyui-combobox" style="width:100%" data-options="
+                                value:item.xiangXing,
+                                editable:false,panelHeight:'auto',
+                                data:[ {
+                                    text: '普通',
+                                    value: '1'
+                                },{
+                                     text: '短板',
+                                     value: '2'
+                                 },{
+                                    text: '短板自卸',
+                                    value: '3'
+                                },{
+                                    text: '冷柜',
+                                    value: '4'
+                                },{
+                                    text: '开顶',
+                                    value: '5'
+                                },{
+                                    text: '罐式',
+                                    value: '6'
+                                },{
+                                    text: '脚架折叠',
+                                    value: '7'
+                                },{
+                                    text: '板框折叠',
+                                    value: '8'
+                                },{
+                                    text: '挂衣',
+                                    value: '9'
+                                }],
+                                 iconWidth:20,
+                                 icons:[{
+                                     iconCls:'icon-clear',
+                                     handler: function(e){
+                                         $(e.data.target).combobox('setValue','');
+                                     }
+                                 }],
+                                 onChange:function(newValue, oldValue){
+                                    item.xiangXing=newValue
+                                 }" /></td>
+            </tr>
+
+            <tr>
+                <td>箱数&nbsp;</td>
+                <td>
+                    <input id="xiangShu" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.xiangShu,
+                            iconWidth:20,
+                            precision:0,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.xiangShu=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>箱数单位&nbsp;</td>
+                <td><input id="xiangShuUnit" class="easyui-combobox" style="width:100%" data-options="
+                                value:item.xiangShuUnit,
+                                editable:false,panelHeight:'auto',
+                                data:[ {
+                                    text: '个',
+                                    value: '1'
+                                },{
+                                     text: '组',
+                                     value: '2'
+                                 }],
+                                 iconWidth:20,
+                                 icons:[{
+                                     iconCls:'icon-clear',
+                                     handler: function(e){
+                                         $(e.data.target).combobox('setValue','');
+                                     }
+                                 }],
+                                 onChange:function(newValue, oldValue){
+                                    item.xiangShuUnit=newValue
+                                 }" /></td>
+            </tr>
+
+           
+            <tr>
+                <td>评分&nbsp;</td>
+                <td>
+                    <input id="pingJiaScore" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.pingJiaScore,
+                            iconWidth:20,
+                            precision:0,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.pingJiaScore=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>评价&nbsp;</td>
+                <td><input id="pingJiaContent" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
+                        value:item.pingJiaContent,
+                        multiline:true,
+                        onChange:function(newValue, oldValue){
+                            item.pingJiaContent=newValue
+                        }" style="width:200px"></td>
+            </tr>
+
+           <tr>
+                    <td>备注&nbsp;</td>
+                    <td><input id="note" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
+                            value:item.note,
+                            multiline:true,
+                            onChange:function(newValue, oldValue){
+                                item.note=newValue
+                            }" style="width:200px"></td>
+                </tr>
+
+            <tr>
+                <td>排序号&nbsp;</td>
+                <td>
+                    <input id="orderNo" class="easyui-numberbox" style="width:100%" 
+                        data-options="
+                            value:item.orderNo,
+                            iconWidth:20,
+                            precision:2,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).textbox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.orderNo=newValue
+                            }
+                        " 
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>创建时间&nbsp;</td>
+                <td>
+                    <input id="insertTime" class="easyui-datetimebox" style="width:100%" 
+                        data-options="
+                            value:moment(item.insertTime).format('YYYY-MM-DD H:mm:ss'),
+                            editable:false,
+                            icons:[{
+                                iconCls:'icon-clear',
+                                handler: function(e){
+                                    $(e.data.target).datetimebox('setValue','');
+                                }
+                            }],
+                            onChange:function(newValue, oldValue){
+                                item.insertTime=newValue
+                            }
+                        "
+                    />
+                </td>
+            </tr>
+
+            <tr><td><span  style="font-weight: 900;">报价&nbsp;</span></td></tr>
+        </tbody>
+    </table>
+
+    <div id="datagridFoot" style="padding:2px 5px;">
+        <a id="update" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-edit"  plain="true"
+            onclick="$('#update,#remove,#reload,#updatePasswordPageEntrance,#freeze,#unfreeze').hide();$('#updateConfirm,#updateCancel').show()"
+            >修改
+        </a>
+        <a id="updateConfirm" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-ok"  plain="true" 
+            onclick="paperUpdate()"
+            >确认
+        </a>
+        <a id="updateCancel" href="JavaScript:void(0)" class="easyui-linkbutton" style="display:none;" iconCls="icon-cancel"  plain="true" 
+            onclick="location.reload()"
+            >取消
+        </a>
+        <a id="remove" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-remove"  plain="true" 
+            onclick="paperDelete()"
+            >删除
+        </a>
+        <a id="reload" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-reload"  plain="true" 
+            onclick="$.messager.confirm('提示','已编辑的数据将丢失, 确认继续吗?',function(r){if(r) location.reload()})"
+            >刷新
+        </a>
+    </div>
+        
+</body>
+<script>
+    $('#datagrid').datagrid()
+</script>
+</html>

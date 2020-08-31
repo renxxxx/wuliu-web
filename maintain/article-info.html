@@ -157,7 +157,7 @@ function updateConfirm(){
 
             $.ajax({
                             type: 'post',
-                            url: '/maintain/article-manage/article-update',
+                            url: '/wuliu/maintain/article-manage/article-update',
                             data: item,
                             success: function (res) {
                                 debugger
@@ -262,7 +262,7 @@ function remove(){
                     <td>
                         <div id="cover">
                             <img style="display:none;" src="./favicon.ico" onload="$('#cover-value').attr('src',item.cover).parent().viewer({url: 'src',});if(item.cover) $('#cover-value').show();" />
-                            <img id="cover-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","../image/image-error.png");' />
+                            <img id="cover-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","./image/image-error.png");' />
                             <input type="file" style="display:none;" onchange="
                                 javascript:
                                 var target = this;
