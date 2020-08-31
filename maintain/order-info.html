@@ -78,6 +78,7 @@ var config = null;
 
 <body style="margin:0;padding:0;font-size:0px;">
     <img id="doingTag" src="./image/doing.gif" style="width:100%;height:5px;position: absolute;top:0;z-index: 999999;display:none;" />
+    <div style="font-size:16px;font-weight: 900;padding:5px 3px;border-bottom:1px solid #e6e6e6;min-width:1000px;background-color: #ccc9c9;">订单详情</div>
     <div id="orderIdPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
         <span 
             style="
@@ -87,7 +88,6 @@ var config = null;
         <span id="orderId" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
         <img src="./favicon.ico" onload="$('#orderId').text(item.orderId||'')" style="display:none;"/>
     </div>
-
     <div id="userPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
         <span 
             style="
@@ -121,6 +121,61 @@ var config = null;
             详细地址</span>
         <span id="faHuoAddress" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
         <img src="./favicon.ico" onload="$('#faHuoAddress').text(item.faHuoAddress)" style="display:none;"/>
+        <span style="cursor: pointer;font-size:14px;color: #616060;margin-left: 10px;"
+            onclick="
+                $('#faHuoAddressEditPad').show();
+                $('#faHuoAddressEditPad .value').val(item.faHuoAddress);
+            " >
+            编辑
+        </span>
+        <div id="faHuoAddressEditPad" style="position:absolute;top:0;bottom:0;left:0;right:0;background-color: rgba(0,0,0,0.6);display:none;overflow:auto;">
+            <div style="width:80%;min-width:1000px;background-color: #FFFFFF;margin:auto;margin-top:50px;border:1px solid #ffffff;">
+                <div style="font-size: 16px;margin-top:10px;margin-left:5px;font-weight: 900;">修改发货详细地址</div>
+                <input class="value" type="text" style="width:500px;margin-left:5px;height:26px;font-size:16px;padding: 3px 3px;margin-top:10px;"/>
+                <div style="margin-top:10px;margin-left:5px;margin-bottom:10px;">
+                    <button style="font-size:18px;cursor: pointer;"
+                        onclick="
+                            $.messager.confirm('提示','确认修改吗？', function(r){
+                                if(r){
+                                    var newFaHuoAddress = $('#faHuoAddressEditPad .value').val()
+                                    if(item.faHuoAddress != newFaHuoAddress){
+                                        $.ajax({
+                                            type: 'post',
+                                            url: '/wuliu/maintain/order-manage/order-update',
+                                            data: {orderId:item.orderId,faHuoAddress:newFaHuoAddress},
+                                            success: function (res) {
+                                                debugger
+                                                if (res.codeMsg)
+                                                    $.messager.alert('提示',res.codeMsg);
+                                                if (res.code == 0) {
+                                                    if (!res.codeMsg)
+                                                        $.messager.alert('提示','修改成功',null,function(){ 
+                                                            item.faHuoAddress=newFaHuoAddress
+                                                        });
+                                                } 
+                                            }
+                                        })
+                                    }else{
+                                        layer.msg('无修改');
+                                    }
+                                }
+                            }); 
+                        ">
+                        确认
+                    </button>
+                    <button style="font-size:18px;margin-left:20px;cursor: pointer;"
+                        onclick="
+                             $.messager.confirm('提示','未保存的内容将会丢失, 确认取消吗?', function(r){
+                                if(r){
+                                    $('#faHuoAddressEditPad').hide()
+                                }
+                            }); 
+                        ">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="faHuoTimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
         <span 
