@@ -131,7 +131,7 @@ var config = null;
         <div id="faHuoAddressEditPad" style="position:absolute;top:0;bottom:0;left:0;right:0;background-color: rgba(0,0,0,0.6);display:none;overflow:auto;">
             <div style="width:80%;min-width:1000px;background-color: #FFFFFF;margin:auto;margin-top:50px;border:1px solid #ffffff;">
                 <div style="font-size: 16px;margin-top:10px;margin-left:5px;font-weight: 900;">修改发货详细地址</div>
-                <input class="value" type="text" style="width:500px;margin-left:5px;height:26px;font-size:16px;padding: 3px 3px;margin-top:10px;"/>
+                <input class="value" type="text" style="width:500px;margin-left:5px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;"/>
                 <div style="margin-top:10px;margin-left:5px;margin-bottom:10px;">
                     <button style="font-size:18px;cursor: pointer;"
                         onclick="
@@ -151,6 +151,7 @@ var config = null;
                                                     if (!res.codeMsg)
                                                         $.messager.alert('提示','修改成功',null,function(){ 
                                                             item.faHuoAddress=newFaHuoAddress
+                                                            $('#faHuoAddressEditPad').hide()
                                                         });
                                                 } 
                                             }
@@ -184,7 +185,70 @@ var config = null;
                 border-right:1px solid #e6e6e6;word-break:break-all;">
             发货时间</span>
         <span id="faHuoTime" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
-        <img src="./favicon.ico" onload="$('#faHuoTime').text(moment(item.faHuoTime).format('YYYY-MM-DD H:mm:ss'))" style="display:none;"/>
+        <img src="./favicon.ico" onload="$('#faHuoTime').text(moment(item.faHuoTime).format('YYYY-MM-DD HH:mm:ss'))" style="display:none;"/>
+        <span style="cursor: pointer;font-size:14px;color: #616060;margin-left: 10px;"
+            onclick="
+                $('#faHuoTimeEditPad').show();
+                $('#faHuoTimeEditPad .value.date').val(moment(item.faHuoTime).format('YYYY-MM-DD'));
+                $('#faHuoTimeEditPad .value.time').val(moment(item.faHuoTime).format('HH:mm'));
+            " >
+            编辑
+        </span>
+        <div id="faHuoTimeEditPad" style="position:absolute;top:0;bottom:0;left:0;right:0;background-color: rgba(0,0,0,0.6);display:none;overflow:auto;">
+            <div style="width:80%;min-width:1000px;background-color: #FFFFFF;margin:auto;margin-top:50px;border:1px solid #ffffff;">
+                <div style="font-size: 16px;margin-top:10px;margin-left:5px;font-weight: 900;">修改发货时间</div>
+                <input class="value date" type="date" style="width:170px;margin-left:5px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;cursor: pointer;"/>
+                <input class="value time" type="time" style="width:90px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;cursor: pointer;"/>
+                <div style="margin-top:10px;margin-left:5px;margin-bottom:10px;">
+                    <button style="font-size:18px;cursor: pointer;"
+                        onclick="
+                            $.messager.confirm('提示','确认修改吗？', function(r){
+                                if(r){
+                                    var date = $('#faHuoTimeEditPad .value.date').val()
+                                    var time = $('#faHuoTimeEditPad .value.time').val()
+                                    time=time?(time+':00'):time;
+                                    newFaHuoTime = date+ ' '+ time
+                                    newFaHuoTime=newFaHuoTime.trim()
+                                    var faHuoTime = moment(item.faHuoTime).format('YYYY-MM-DD HH:mm')
+                                    if(faHuoTime != newFaHuoTime){
+                                        $.ajax({
+                                            type: 'post',
+                                            url: '/wuliu/maintain/order-manage/order-update',
+                                            data: {orderId:item.orderId,faHuoTime:newFaHuoTime},
+                                            success: function (res) {
+                                                debugger
+                                                if (res.codeMsg)
+                                                    $.messager.alert('提示',res.codeMsg);
+                                                if (res.code == 0) {
+                                                    if (!res.codeMsg)
+                                                        $.messager.alert('提示','修改成功',null,function(){ 
+                                                            item.faHuoTime=newFaHuoAddress
+                                                            $('#faHuoTimeEditPad').hide()
+                                                        });
+                                                } 
+                                            }
+                                        })
+                                    }else{
+                                        layer.msg('无修改');
+                                    }
+                                }
+                            }); 
+                        ">
+                        确认
+                    </button>
+                    <button style="font-size:18px;margin-left:20px;cursor: pointer;"
+                        onclick="
+                             $.messager.confirm('提示','未保存的内容将会丢失, 确认取消吗?', function(r){
+                                if(r){
+                                    $('#faHuoTimeEditPad').hide()
+                                }
+                            }); 
+                        ">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="shouHuoPad">
         <img src="./favicon.ico" onload="item.shouHuoArea1Name?$('#shouHuoPad').show():$('#shouHuoPad').hide()" style="display:none;"/>
@@ -197,6 +261,152 @@ var config = null;
                 收货地1</span>
             <span id="shouHuoArea" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
             <img src="./favicon.ico" onload="$('#shouHuoArea').text(item.shouHuoArea1Name?[item.shouHuoArea1Name,item.shouHuoArea2Name,item.shouHuoArea3Name].join().replace(/,/g,' / '):'')" style="display:none;"/>
+            <span style="cursor: pointer;font-size:14px;color: #616060;margin-left: 10px;"
+                onclick="
+                    $('#shouHuoAreaEditPad').show();
+                    $('#shouHuoAreaEditPad .value.area1').html(`<option value=''>--省--</option>`)
+                    $('#shouHuoAreaEditPad .value.area2').html(`<option value=''>--市--</option>`)
+                    $('#shouHuoAreaEditPad .value.area3').html(`<option value=''>--区--</option>`)
+
+                    $.ajax({
+                        url:'../other/area.json',
+                        success:function(res){
+                            for (let index = 0; index < res.length; index++) {
+                                const element = res[index];
+                                var option = $(`<option value=${element.code}>${element.name}</option>`)
+                                option[0].sons=element.children
+                                $('#shouHuoAreaEditPad .value.area1').append(option)
+                            }
+                        }
+                    })
+
+                    if(item.shouHuoArea1Id){
+                        var s1 = setInterval(() => {
+                            debugger
+                            if(!$('#shouHuoAreaEditPad .value.area1')[0].value){
+                                $('#shouHuoAreaEditPad .value.area1')[0].value=item.shouHuoArea1Id
+                                $('#shouHuoAreaEditPad .value.area1').change()
+                            }else{
+                                clearInterval(s1)
+                            }
+                        }, 500);
+                    }
+                    if(item.shouHuoArea2Id){
+                        var s2 = setInterval(() => {
+                            debugger
+                            if(!$('#shouHuoAreaEditPad .value.area2')[0].value){
+                                $('#shouHuoAreaEditPad .value.area2')[0].value=item.shouHuoArea2Id
+                                $('#shouHuoAreaEditPad .value.area2').change()
+                            }else{
+                                clearInterval(s2)
+                            }
+                        }, 500);
+                    }
+                    
+                    if(item.shouHuoArea3Id){
+                        var s3 = setInterval(() => {
+                            debugger
+                            if(!$('#shouHuoAreaEditPad .value.area3')[0].value){
+                                $('#shouHuoAreaEditPad .value.area3')[0].value=item.shouHuoArea3Id
+                                $('#shouHuoAreaEditPad .value.area3').change()
+                            }else{
+                                clearInterval(s3)
+                            }
+                        }, 500);
+                    }
+                    
+                " >
+                编辑
+            </span>
+            <div id="shouHuoAreaEditPad" style="position:absolute;top:0;bottom:0;left:0;right:0;background-color: rgba(0,0,0,0.6);display:none;overflow:auto;">
+                <div style="width:80%;min-width:1000px;background-color: #FFFFFF;margin:auto;margin-top:50px;border:1px solid #ffffff;">
+                    <div style="font-size: 16px;margin-top:10px;margin-left:5px;font-weight: 900;">修改收货地1</div>
+                    <select class="value area1" type="text" style="width:100px;margin-left:5px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;cursor: pointer;vertical-align: top;"
+                        onchange="
+                            $('#shouHuoAreaEditPad .value.area2').html(`<option value=''>--市--</option>`)
+                            $('#shouHuoAreaEditPad .value.area3').html(`<option value=''>--区--</option>`)
+                            var area1Option = $('#shouHuoAreaEditPad .value.area1 option:selected');
+                            var sons = area1Option[0].sons
+                            for (let index = 0;sons && index < sons.length; index++) {
+                                const element = sons[index];
+                                var option = $(`<option value=${element.code}>${element.name}</option>`)
+                                option[0].sons=element.children
+                                $('#shouHuoAreaEditPad .value.area2').append(option)
+                            }
+                        ">
+                    </select>
+                    <select class="value area2" type="text" style="width:100px;margin-left:5px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;cursor: pointer;vertical-align: top;"
+                        onchange="
+                            $('#shouHuoAreaEditPad .value.area3').html(`<option value=''>--区--</option>`)
+                            var area2Option = $('#shouHuoAreaEditPad .value.area2 option:selected');
+                            var sons = area2Option[0].sons
+                            for (let index = 0;sons && index < sons.length; index++) {
+                                const element = sons[index];
+                                var option = $(`<option value=${element.code}>${element.name}</option>`)
+                                option[0].sons=element.children
+                                $('#shouHuoAreaEditPad .value.area3').append(option)
+                            }
+                        ">
+                    </select>
+                    <select class="value area3" type="text" style="width:100px;margin-left:5px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;cursor: pointer;vertical-align: top;"></select>
+                    <div style="margin-top:10px;margin-left:5px;margin-bottom:10px;">
+                        <button style="font-size:18px;cursor: pointer;"
+                            onclick="
+                                $.messager.confirm('提示','确认修改吗？', function(r){
+                                    if(r){
+                                        var newShouHuoArea1Id =  $('#shouHuoAreaEditPad .value.area1').val()
+                                        var newShouHuoArea1Name =  $('#shouHuoAreaEditPad .value.area1 option:selected').text()
+                                        var newShouHuoArea2Id =  $('#shouHuoAreaEditPad .value.area2').val()
+                                        var newShouHuoArea2Name =  $('#shouHuoAreaEditPad .value.area2 option:selected').text()
+                                        var newShouHuoArea3Id =  $('#shouHuoAreaEditPad .value.area3').val()
+                                        var newShouHuoArea3Name =  $('#shouHuoAreaEditPad .value.area3 option:selected').text()
+                                        if(item.shouHuoArea3Id != newShouHuoArea3Id){
+                                            $.ajax({
+                                                type: 'post',
+                                                url: '/wuliu/maintain/order-manage/order-update',
+                                                data: {
+                                                    orderId:item.orderId,
+                                                    shouHuoArea1Id:newShouHuoArea1Id,
+                                                    shouHuoArea2Id:newShouHuoArea2Id,
+                                                    shouHuoArea3Id:newShouHuoArea3Id,
+                                                    shouHuoArea1Name:newShouHuoArea1Name,
+                                                    shouHuoArea2Name:newShouHuoArea2Name,
+                                                    shouHuoArea3Name:newShouHuoArea3Name
+                                                },
+                                                success: function (res) {
+                                                    debugger
+                                                    if (res.codeMsg)
+                                                        $.messager.alert('提示',res.codeMsg);
+                                                    if (res.code == 0) {
+                                                        if (!res.codeMsg)
+                                                            $.messager.alert('提示','修改成功',null,function(){ 
+                                                                item.faHuoAddress=newFaHuoAddress
+                                                                $('#shouHuoAreaEditPad').hide()
+                                                            });
+                                                    } 
+                                                }
+                                            })
+                                        }else{
+                                            layer.msg('无修改');
+                                        }
+                                    }
+                                }); 
+                            ">
+                            确认
+                        </button>
+                        <button style="font-size:18px;margin-left:20px;cursor: pointer;"
+                            onclick="
+                                $.messager.confirm('提示','未保存的内容将会丢失, 确认取消吗?', function(r){
+                                    if(r){
+                                        $('#shouHuoAreaEditPad').hide()
+                                    }
+                                }); 
+                            ">
+                            取消
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="shouHuoAddressPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
             <span 
