@@ -542,6 +542,264 @@ function remove(){
                         </select>
                     </td>
                 </tr>
+                <tr></tr>
+                <tr>
+                    <td>斤单价(元)&nbsp;</td>
+                    <td>
+                        <input id="jinPrice" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.jinPrice,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.jinPrice=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>件单价(元)&nbsp;</td>
+                    <td>
+                        <input id="jianPrice" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.jianPrice,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.jianPrice=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td>小柜单价(元)&nbsp;</td>
+                    <td>
+                        <input id="xiaoGuiPrice" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.xiaoGuiPrice,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.xiaoGuiPrice=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>重量(KG)&nbsp;</td>
+                    <td>
+                        <input id="xiaoGuiWeight" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.xiaoGuiWeight,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.xiaoGuiWeight=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>体积(M3)&nbsp;</td>
+                    <td>
+                        <input id="xiaoGuiVolumn" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.xiaoGuiVolumn,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.xiaoGuiVolumn=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td>大柜单价(元)&nbsp;</td>
+                    <td>
+                        <input id="daGuiPrice" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.daGuiPrice,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.daGuiPrice=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>重量(KG)&nbsp;</td>
+                    <td>
+                        <input id="daGuiWeight" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.daGuiWeight,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.daGuiWeight=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>体积(M3)&nbsp;</td>
+                    <td>
+                        <input id="daGuiVolumn" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.daGuiVolumn,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.daGuiVolumn=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+<tr></tr>
+                <tr>
+                    <td>xx柜数量&nbsp;</td>
+                    <td>
+                        <input id="diyGuiCount" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.diyGuiCount,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.diyGuiCount=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>价格(元)&nbsp;</td>
+                    <td>
+                        <input id="diyGuiPrice" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.diyGuiPrice,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.diyGuiPrice=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>重量(KG)&nbsp;</td>
+                    <td>
+                        <input id="diyGuiWeight" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.diyGuiWeight,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.diyGuiWeight=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>体积(M3)&nbsp;</td>
+                    <td>
+                        <input id="diyGuiVolumn" class="easyui-numberbox" style="width:100%" 
+                            data-options="
+                                value:item.diyGuiVolumn,
+                                precision:2,
+                                iconWidth:20,
+                                icons:[{
+                                    iconCls:'icon-clear',
+                                    handler: function(e){
+                                        $(e.data.target).textbox('setValue','');
+                                    }
+                                }],
+                                onChange:function(newValue, oldValue){
+                                    item.diyGuiVolumn=newValue
+                                }
+                            " 
+                        />
+                    </td>
+                </tr>
+                <tr></tr>
                 <tr>
                     <td>简介&nbsp;</td>
                     <td><input id="intro" class="easyui-textbox" style="width:100%;height:200px;padding: 3px 3px;" data-options="
@@ -557,29 +815,8 @@ function remove(){
                     <td><textarea id="content" style="width: 100%;height:500px;padding:1px 4px" placeholder="
                         图片自适应: 宽度: 100%, 高度: 空."></textarea></td>
                 </tr>
-                <tr>
-                    <td>单位&nbsp;</td>
-                    <td><input id="unit" class="easyui-combobox" style="width:100%" data-options="
-                                    value:item.unit,
-                                    editable:false,panelHeight:'auto',
-                                    data:[ {
-                                        text: '件',
-                                        value: '1'
-                                    },{
-                                         text: '斤',
-                                         value: '2'
-                                     }],
-                                     iconWidth:20,
-                                     icons:[{
-                                         iconCls:'icon-clear',
-                                         handler: function(e){
-                                             $(e.data.target).combobox('setValue','');
-                                         }
-                                     }],
-                                     onChange:function(newValue, oldValue){
-                                        item.unit=newValue
-                                     }" /></td>
-                </tr>
+               
+
                 <tr>
                     <td>浏览量&nbsp;</td>
                     <td>
