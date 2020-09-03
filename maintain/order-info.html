@@ -606,6 +606,15 @@ var config = null;
         <span id="huoWuLeiXing" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
         <img src="./favicon.ico" onload="$('#huoWuLeiXing').text(project.huoWuLeiXing(item.huoWuLeiXing))" style="display:none;"/>
     </div>
+    <div id="huoWuLeiXingDetailPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            货物详情</span>
+        <span id="huoWuLeiXingDetail" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#huoWuLeiXingDetail').text(item.huoWuLeiXingDetail||'')" style="display:none;"/>
+    </div>
     <div id="huoWuWeightPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
         <span 
             style="
