@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>集贤装-运维-用户管理</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="./favicon.ico" type="image/svg" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./layer/layer.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+    <style></style>
+
+    <script>
+        debugger
+        var config = null;
+        $.ajax({
+            url:'../config.json',
+            async:false,
+            success:function(res){
+                config=res;
+            }
+        })
+
+        layer.config({offset: '200px'});
+        $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+            $('#doingTag').show();
+        });
+        $.ajaxSetup({
+            complete:function(){
+                $('#doingTag').hide();
+            },
+            error:function(xhr){
+                debugger
+                
+            }
+        })
+
+        var qso = util.queryStringObject();
+        var queryParam = {
+            frozen:'0',
+            renZhengType:2,
+        }
+        var currentItems = [], sum = {}
+
+        $(document).ready(function(){
+            $.post('/wuliu/login-refresh',function(res){                
+                if(res.code==0){
+                    
+                }else{
+                    $.messager.alert('提示', '您还未登录');
+                }
+            })
+            $('#datagrid').datagrid({
+                columns: [[
+                    {
+                        field: 'logo', title: '头像', width: 60, align: 'center', halign: 'center', formatter: function (value, row, index) {
+                            return value ? `<span class="image-previewer"><img src='${value}' style='width:50px;cursor:pointer;'/></span>` : value
+                        }
+                    },
+                    {
+                        field: 'phone', title: '手机', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${value || ''}" 
+                                        >${value || ''}
+                                    </span>`;
+                        }
+                    },
+                    {
+                        field: 'realname', title: '姓名', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${value || ''}" 
+                                        >${value || ''}
+                                    </span>`;
+                        }
+                    },
+                    {
+                        field: 'inArea', title: '区域', width: 200, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<span style="width:100%;display:inline-block;" title="${row.inArea1Name||''}${row.inArea2Name?(' / '+row.inArea2Name):''}${row.inArea3Name?(' / '+row.inArea3Name):''}" 
+                                        >${row.inArea1Name||''}${row.inArea2Name?(' / '+row.inArea2Name):''}${row.inArea3Name?(' / '+row.inArea3Name):''}
+                                    </span>`;
+                        }
+                    },
+                    {
+                        field: 'lastAliveTime', title: '最后活跃时间', width: 175, align: 'center', sortable: true, halign: 'center', formatter: function (value, row, index) {
+                            return value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : value;
+                        }
+                    },
+                    {
+                        field: 'insertTime', title: '创建时间', width: 175, align: 'center', sortable: true, halign: 'center', formatter: function (value, row, index) {
+                            return value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : value;
+                        }
+                    },
+                    {
+                        field: ' ', title: '操作', width: 175, align: 'left',  halign: 'center', formatter: function (value, row, index) {
+                            debugger
+                            return '' ;
+                        }
+                    }
+                ]],
+                frozenColumns: [[
+                    { field: 'ck', align: 'left', checkbox: true },
+                    {
+                        field: 'nickname', title: '昵称', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                            return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
+                                        onclick="project.newTab({title:'用户:${value.substring(0, 10) + '...'}',url:'./user-info.html?userId=${row.userId}'})"
+                                    >${value || ''}
+                                    </a>`;
+                        }, styler: function (value, row, index) {
+                            return ``
+                        }
+                    }
+                ]],
+                idField: 'userId',
+                toolbar: `#datagridToolBar`,
+                footer: `#datagridFoot`,
+                pagination: true,
+                rownumbers: true,
+                emptyMsg: '无数据',
+                singleSelect: false,
+                pageSize: 15,
+                pageList:[10,15,20,25,30,35,40,45,50],
+                ctrlSelect: true,
+                checkOnSelect: true,
+                selectOnCheck: true,
+                multiSort: true,
+                autoRowHeight: false,
+                rowStyler: function (index, row) {
+
+                },
+                loader: function (param, success, error) {
+                    debugger
+                    queryParam.ps = param.rows;
+                    queryParam.pn = param.page;
+                    queryParam.sort = param.sort;
+                    queryParam.order = param.order;
+
+                    $.get('/wuliu/maintain/user-manage/users', queryParam, function (data) {
+                        if (data.codeMsg)
+                            $.messager.alert('提示',data.codeMsg);
+                        if (data.code == 0) {
+                            currentItems = data.data.items;
+                            $.get('/wuliu/maintain/user-manage/users-sum', queryParam, function (data) {
+                                if (data.codeMsg)
+                                    $.messager.alert('提示',data.codeMsg);
+                                if (data.code == 0) {
+                                    sum = data.data;
+                                    success({rows:currentItems,total:sum.itemCount});
+                                }
+                            })
+                        } else {
+
+                        }
+                    })
+                }, onLoadSuccess: function () {
+                    $('.image-previewer').viewer({
+                        url: 'src',
+                    })
+                }
+            });// $('#datagrid').datagrid()
+        })//document.ready()
+
+        
+    </script>
+</head>
+
+<body style="margin:0;padding:0;" >
+    <div id="datagridToolBar" style="padding:2px 5px;">
+        <div style="margin-top:5px;">
+            <a href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-search"
+                onclick="$('#datagrid').datagrid('load').datagrid('clearChecked');">
+                查询
+            </a>
+            <a href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-clear"
+                onclick="$('#datagridToolBar-form').form('clear')">
+                清空
+            </a>
+        </div>
+        <form id="datagridToolBar-form" style="margin-top:10px;">  
+            <div style="display:inline-block;">
+            <input id="queryParam.kw" class="easyui-textbox" label="关键字:" labelPosition="left" labelAlign="right" 
+                data-options="
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        queryParam.kw=newValue
+                    }" style="width:300px" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam-inArea1Id" class="easyui-combobox" label="省" labelPosition="left" labelAlign="right"  style="width:300px" data-options="
+                value:queryParam.inArea1Id,
+                text:queryParam.inArea1Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        $.ajax({
+                            url: '../other/area.json',
+                            type: 'get',
+                            data: {},
+                            success: function (data) {
+                                debugger
+                                
+                                for(var i=0;i<data.length;i++){
+                                    $('#queryParam-inArea1Id')[0]['inArea'+data[i].code]=data[i].children
+                                }
+
+                                $('#queryParam-inArea2Id').combobox('reload')
+                                success({rows:data});
+                            }
+                        })
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        queryParam.inArea1Id=newValue
+                        queryParam.inArea1Name= $('#queryParam-inArea1Id').combobox('getText')
+
+                        queryParam.inArea2Id=null;
+                        queryParam.inArea2Name=null;
+                        $('#queryParam-inArea2Id').combobox('setText',null)
+                        $('#queryParam-inArea2Id').combobox('setValue',null)
+
+                        queryParam.inArea3Id=null;
+                        queryParam.inArea3Name=null;
+                        $('#queryParam-inArea3Id').combobox('setText',null)
+                        $('#queryParam-inArea3Id').combobox('setValue',null)
+
+
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            queryParam.inArea1Id=null;
+                            queryParam.inArea1Name=null;
+                            $('#queryParam-inArea1Id').combobox('setText',null)
+                            $('#queryParam-inArea1Id').combobox('setValue',null)
+
+                            queryParam.inArea2Id=null;
+                            queryParam.inArea2Name=null;
+                            $('#queryParam-inArea2Id').combobox('setText',null)
+                            $('#queryParam-inArea2Id').combobox('setValue',null)
+
+                            queryParam.inArea3Id=null;
+                            queryParam.inArea3Name=null;
+                            $('#queryParam-inArea3Id').combobox('setText',null)
+                            $('#queryParam-inArea3Id').combobox('setValue',null)
+
+                        }
+                    }]
+                    ">
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam-inArea2Id" class="easyui-combobox" label="市" labelPosition="left" labelAlign="right"  style="width:300px" data-options="
+                valueField:'code',
+                textField:'name',
+                mode:'remote',
+                onShowPanel:function(){
+                    $(this).combobox('reload')
+                },
+
+                loader: function (param, success, error) {
+                    debugger
+                    var ss = $('#queryParam-inArea1Id')[0]['inArea'+queryParam.inArea1Id];
+                    for(var i=0;ss && i<ss.length;i++){
+                        debugger
+                        $('#queryParam-inArea2Id')[0]['inArea'+ss[i].code]=ss[i].children
+                    }
+                    success({rows:ss?ss:[]});
+                    
+                },
+                onChange:function(newValue, oldValue){
+                    debugger
+                    queryParam.inArea2Id=newValue
+                    queryParam.inArea2Name= $('#queryParam-inArea2Id').combobox('getText')
+
+                    queryParam.inArea3Id=null;
+                    queryParam.inArea3Name=null;
+                    $('#queryParam-inArea3Id').combobox('setText',null)
+                    $('#queryParam-inArea3Id').combobox('setValue',null)
+
+                },
+                loadFilter: function (data) {
+                    debugger
+                    return data.rows;
+                },
+                iconWidth:20,
+                icons:[{
+                    iconCls:'icon-clear',
+                    handler: function(e){
+                        $(e.data.target).combobox('setValue','');
+                        queryParam.inArea2Id=null;
+                        queryParam.inArea2Name=null;
+                        $('#queryParam-inArea2Id').combobox('setText',null)
+                        $('#queryParam-inArea2Id').combobox('setValue',null)
+
+                        queryParam.inArea3Id=null;
+                        queryParam.inArea3Name=null;
+                        $('#queryParam-inArea3Id').combobox('setText',null)
+                        $('#queryParam-inArea3Id').combobox('setValue',null)
+                    }
+                }]
+                ">
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam-inArea3Id" class="easyui-combobox" label="区" labelPosition="left" labelAlign="right"  style="width:300px" data-options="
+                    value:queryParam.inArea3Id,
+                    text:queryParam.inArea3Name,
+                    valueField:'code',
+                    textField:'name',
+                    mode:'remote',
+                    onShowPanel:function(){
+                        $(this).combobox('reload')
+                    },
+                    loader: function (param, success, error) {
+                        debugger
+                        var ss = $('#queryParam-inArea2Id')[0]['inArea'+queryParam.inArea2Id];
+                        
+                        success({rows:ss?ss:[]});
+                    },
+                    onChange:function(newValue, oldValue){
+                        debugger
+                        queryParam.inArea3Id=newValue
+                        queryParam.inArea3Name= $('#queryParam-inArea3Id').combobox('getText')
+                        
+                    },
+                    loadFilter: function (data) {
+                        debugger
+                        return data.rows;
+                    },
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                            queryParam.inArea3Id=null;
+                            queryParam.inArea3Name=null;
+                            $('#queryParam-inArea3Id').combobox('setText',null)
+                            $('#queryParam-inArea3Id').combobox('setValue',null)
+                        }
+                    }]
+                    ">
+            </div>
+            <div style="display:inline-block;">
+                <input id="queryParam.renZhengIs" class="easyui-combobox" label="认证:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.renZhengIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未认证',
+                                value: '0'
+                            },
+                            {
+                                text: '通过',
+                                value: '1'
+                            },
+                            {
+                                text: '拒绝',
+                                value: '2'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.renZhengIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.renZhengTiJiaoIs" class="easyui-combobox" label="提交认证:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.renZhengTiJiaoIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未提交',
+                                value: '0'
+                            },
+                            {
+                                text: '已提交',
+                                value: '1'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.renZhengTiJiaoIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.fuWuShangRenZhengIs" class="easyui-combobox" label="服务商认证:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.fuWuShangRenZhengIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未认证',
+                                value: '0'
+                            },
+                            {
+                                text: '通过',
+                                value: '1'
+                            },
+                            {
+                                text: '拒绝',
+                                value: '2'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.fuWuShangRenZhengIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.fuWuShangRenZhengTiJiaoIs" class="easyui-combobox" label="服务商提交认证:"  labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.fuWuShangRenZhengTiJiaoIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '未提交',
+                                value: '0'
+                            },
+                            {
+                                text: '已提交',
+                                value: '1'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.fuWuShangRenZhengTiJiaoIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.frozen" class="easyui-combobox" label="冻结:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.frozen,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '否',
+                                value: '0'
+                            },
+                            {
+                                text: '是',
+                                value: '1'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.frozen=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.adminIs" class="easyui-combobox" label="管理员:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.adminIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '否',
+                                value: '0'
+                            },
+                            {
+                                text: '是',
+                                value: '1'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.adminIs=newValue
+                        }" />
+            </div>
+
+            <div style="display:inline-block;">
+                <input id="queryParam.maintainIs" class="easyui-combobox" label="运维:" labelPosition="left" labelAlign="right" style="width:300px" 
+                    data-options="
+                        value:queryParam.maintainIs,
+                        editable:false,panelHeight:'auto',
+                        data:[
+                            {
+                                text: '否',
+                                value: '0'
+                            },
+                            {
+                                text: '是',
+                                value: '1'
+                            }],
+                        iconWidth:20,
+                        icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            $(e.data.target).combobox('setValue','');
+                        }
+                        }],
+                        onChange:function(newValue, oldValue){
+                            queryParam.maintainIs=newValue
+                        }" />
+            </div>
+        </form>
+    </div>
+    <table id="datagrid" class="easyui-datagrid" style="width:100%;min-height:50px"></table>
+    <div id="datagridFoot" style="padding:2px 5px;">
+        <a href="JavaScript:void(0)" class="easyui-linkbutton"  iconCls="icon-add" plain="true"
+            onclick="
+                project.newTab({title:'添加用户',url:'./user-insert.html'})
+            ">
+            添加用户
+        </a>
+        <!-- <a href="JavaScript:void(0)" class="easyui-linkbutton"  iconCls="icon-edit" plain="true"
+            onclick="
+                var ids = $($('#datagrid').datagrid('getChecked')).oneall('attrs','wxVideoaccountId');
+                ids = ids==null?[]:ids;
+                layer.open({
+                    type: 2,
+                    title: '批量修改',
+                    shadeClose: false,
+                    inArea:['60%','90%'],
+                    shade: 0.5,
+                    content: './update-wx-videoaccount-list.html?'+$.param($.extend({},queryParam,{wxVideoaccountId:ids.length==0?null:ids.join(),expectedItemCount:ids.length==0?sum.itemCount:ids.length}))
+                }); ">
+            批量修改
+        </a>
+        <a href="JavaScript:void(0)" class="easyui-linkbutton" title="删除" iconCls="icon-remove" plain="true"
+            onclick="
+                debugger
+                var ids = $($('#datagrid').datagrid('getChecked')).oneall('attrs','wxVideoaccountId')
+                ids = ids==null?[]:ids;
+                $.messager.confirm('提示',ids.length==0?'未选择任何记录, 将删除所有已查出的 '+ sum.itemCount +' 条记录, 确认删除吗?':('已选择 '+ids.length+' 条记录, 确认删除吗?'),function(r){
+                    if(r)  {
+                        $.messager.confirm('提示','危险操作, 再次确认! '+(ids.length==0?'未选择任何记录, 将删除所有已查出的 '+ sum.itemCount +' 条记录, 确认删除吗?':('已选择 '+ids.length+' 条记录, 确认删除吗?')),function(r){
+                        if(r)
+                            $.ajax({
+                            type: 'post',
+                            url: '/wuliu/maintain/wx-videoaccount/delete-wx-videoaccount-list',
+                            data: $.extend({},queryParam,{wxVideoaccountId:ids.length==0?null:ids.join(),expectedItemCount:ids.length==0?sum.itemCount:ids.length}),
+                            success: function (res) {
+                                debugger
+                                if (res.codeMsg)
+                                    $.messager.alert('提示',res.codeMsg);
+                                if (res.code == 0) {
+                                    if (!res.codeMsg)
+                                        $.messager.alert('提示','操作成功')
+                                        $('#datagrid').datagrid('reload');
+                                } 
+                            }
+                        }) 
+                    })
+                
+                    }      
+                })
+                ">
+            批量删除
+        </a> -->
+    </div>
+</body>
+<script>
+   
+
+</script>
+
+</html>
