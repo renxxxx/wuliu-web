@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>集贤装-运维-新建类型</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./layer/layer.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+    <style></style>
+</head>
+
+<script>
+var config = null;
+    $.ajax({
+        url:'../config.json',
+        async:false,
+        success:function(res){
+            config=res;
+        }
+    })
+
+    layer.config({offset: '200px'});
+
+    {
+        $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+            $('#doingTag').show();
+        });
+
+        $.ajaxSetup({
+            complete:function(){
+                $('#doingTag').hide();
+            },
+            error:function(xhr){
+                
+            }
+        })
+    }
+    
+
+    var qso = util.queryStringObject();
+    qso.upperId;
+    qso.upperName;
+
+    var item = {
+        upperId:qso.upperId||'',
+        upperName:qso.upperName||''
+    }
+
+    $.parser.onComplete = function () {
+        debugger
+    }
+
+    $(document).ready(function(){
+        debugger
+    })
+
+  
+             
+        
+</script>
+
+<body style="margin:0;padding:0;font-size:0px;">
+    <img id="doingTag" src="./image/doing.gif" style="width:100%;height:5px;position: absolute;top:0;z-index: 999999;display:none;" />
+    <div style="font-size:16px;font-weight: 900;padding:5px 3px;border-bottom:1px solid #e6e6e6;min-width:1000px;background-color: #ccc9c9;">类型详情</div>
+    
+    <div id="namePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            类型名
+        </span>
+        <input id="name" type="text" style="font-size:16px;display: inline-block;padding:3px 3px;width:1000px;word-break:break-all;margin-left:-1px;"
+            oninput="item.name=this.value||''" />
+    </div>
+    <div id="orderNoPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            排序号
+        </span>
+        <input id="orderNo" type="number" style="font-size:16px;display: inline-block;padding:3px 3px;width:1000px;word-break:break-all;margin-left:-1px;" 
+            oninput="item.orderNo=this.value||''"/>
+    </div>
+
+    <div id="operate" style="background-color: #e6e6e6;min-width:1000px;" >
+        <button style="cursor: pointer;margin:10px 0 10px 15px;font-size:20px;" 
+            onclick="
+                $.messager.confirm('提示','确认新建吗？', function(r){
+                if(r) {
+                    $.ajax({
+                        type: 'post',
+                        url: '/wuliu/maintain/goods-type/item-insert',
+                        data: item,
+                        success: function (res) {
+                            debugger
+                            if (res.codeMsg)
+                                $.messager.alert('提示',res.codeMsg);
+                            if (res.code == 0) {
+                                if (!res.codeMsg)
+                                    $.messager.alert('提示','新建成功',null,function(){ location.reload()});
+                            } 
+                        }
+                    })
+                } 
+            });">
+            确认
+        </button>
+        <button style="cursor: pointer;margin:10px 0 10px 15px;font-size:20px;" 
+            onclick="
+                $.messager.confirm('提示','确认清空吗？', function(r){
+                if(r)
+                    location.reload()
+            });">
+            清空
+        </button>
+    </div>
+    
+
+</body>
+<script>
+   
+</script>
+</html>

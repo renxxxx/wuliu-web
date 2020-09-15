@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>集贤装-运维-类型信息</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./layer/layer.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+    <style></style>
+</head>
+
+<script>
+var config = null;
+    $.ajax({
+        url:'../config.json',
+        async:false,
+        success:function(res){
+            config=res;
+        }
+    })
+
+    layer.config({offset: '200px'});
+    $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        $('#doingTag').show();
+    });
+    $.ajaxSetup({
+        complete:function(){
+            $('#doingTag').hide();
+        },
+        error:function(xhr){
+            
+        }
+    })
+
+    var qso = util.queryStringObject();
+    qso.goodsTypeId;
+    var item = {}
+
+    $.ajax({
+        type: 'get',
+        url: `/wuliu/maintain/goods-type/item-info?goodsTypeId=${qso.goodsTypeId}`,
+        async: false,
+        success: function (res) {
+            debugger
+            if (res.codeMsg)
+                layer.msg(res.codeMsg);
+            if (res.code == 0) {
+                item = res.data;
+            }
+        }
+    })
+
+    $.parser.onComplete = function () {
+        debugger
+    }
+
+    $(document).ready(function(){
+        debugger
+    })
+
+  
+             
+        
+</script>
+
+<body style="margin:0;padding:0;font-size:0px;">
+    <img id="doingTag" src="./image/doing.gif" style="width:100%;height:5px;position: absolute;top:0;z-index: 999999;display:none;" />
+    <div style="font-size:16px;font-weight: 900;padding:5px 3px;border-bottom:1px solid #e6e6e6;min-width:1000px;background-color: #ccc9c9;">类型详情</div>
+    <div id="goodsTypeIdPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            类型Id</span>
+        <span id="goodsTypeId" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#goodsTypeId').text(item.goodsTypeId||'')" style="display:none;"/>
+    </div>
+    <div id="namePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            类型名</span>
+        <span id="name" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#name').text(item.name||'')" style="display:none;"/>
+        <span style="cursor: pointer;font-size:14px;color: #616060;margin-left: 10px;"
+            onclick="
+                $('#nameEditPad').show();
+                $('#nameEditPad .value').val(item.name);
+            " >
+            编辑
+        </span>
+        <div id="nameEditPad" style="position:absolute;top:0;bottom:0;left:0;right:0;background-color: rgba(0,0,0,0.6);display:none;overflow:auto;">
+            <div style="width:80%;min-width:1000px;background-color: #FFFFFF;margin:auto;margin-top:50px;border:1px solid #ffffff;">
+                <div style="font-size: 16px;margin-top:10px;margin-left:5px;font-weight: 900;">修改发货详细地址</div>
+                <input class="value" type="text" style="width:500px;margin-left:5px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;"/>
+                <div style="margin-top:10px;margin-left:5px;margin-bottom:10px;">
+                    <button style="font-size:18px;cursor: pointer;"
+                        onclick="
+                            $.messager.confirm('提示','确认修改吗？', function(r){
+                                if(r){
+                                    var newName = $('#nameEditPad .value').val()
+                                    if(item.name != newName){
+                                        $.ajax({
+                                            type: 'post',
+                                            url: '/wuliu/maintain/goods-type/item-update',
+                                            data: {goodsTypeId:item.goodsTypeId,name:newName},
+                                            success: function (res) {
+                                                debugger
+                                                if (res.codeMsg)
+                                                    $.messager.alert('提示',res.codeMsg);
+                                                if (res.code == 0) {
+                                                    if (!res.codeMsg)
+                                                        $.messager.alert('提示','修改成功',null,function(){ 
+                                                            item.name=newName
+                                                            $('#name').text(item.name||'')
+                                                            $('#nameEditPad').hide()
+                                                        });
+                                                } 
+                                            }
+                                        })
+                                    }else{
+                                        layer.msg('无修改');
+                                        $('#nameEditPad').hide()
+                                    }
+                                }
+                            }); 
+                        ">
+                        确认
+                    </button>
+                    <button style="font-size:18px;margin-left:20px;cursor: pointer;"
+                        onclick="
+                            var newName = $('#nameEditPad .value').val()
+                            if(item.name != newName){
+                                $.messager.confirm('提示','值已被修改, 确认取消吗?', function(r){
+                                    if(r){
+                                        $('#nameEditPad').hide()
+                                    }
+                                }); 
+                            }else{
+                                $('#nameEditPad').hide()
+                            }
+                            
+                        ">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="lowersCountPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            下级数
+        </span>
+        <span style="display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+            <a id="lowersCount" href="javascript:void(0);" style="font-size:16px;"
+                onclick="
+                    project.newTab({title:'类型',url:'./goods-type.html?upperId='+item.goodsTypeId+'&upperName='+item.name})">
+            </a>
+        </span>
+        <img src="./favicon.ico" onload="$('#user').text(item.lowersCount)" style="display:none;"/>
+    </div>
+    <div id="orderNoPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            排序号</span>
+        <span id="orderNo" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#orderNo').text(item.orderNo?(item.orderNo):'')" style="display:none;"/>
+    </div>
+    <div id="insertTimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            创建时间</span>
+        <span id="insertTime" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#insertTime').text(item.insertTime?moment(item.insertTime).format('YYYY-MM-DD H:mm:ss'):'')" style="display:none;"/>
+    </div>
+
+    <div id="operate" style="background-color: #e6e6e6;min-width:1000px;" >
+        <button style="cursor: pointer;margin:10px 0 10px 3px;font-size:20px;" onclick="location.reload()">刷新</button>
+        <button style="cursor: pointer;margin:10px 0 10px 15px;font-size:20px;" 
+            onclick="
+                $.messager.confirm('提示','确认删除吗？', function(r){
+                if(r)
+                    $.ajax({
+                        type: 'post',
+                        url: '/wuliu/maintain/goods-type/items-delete',
+                        data: {goodsTypeId:item.goodsTypeId},
+                        success: function (res) {
+                            debugger
+                            if (res.codeMsg)
+                                $.messager.alert('提示',res.codeMsg);
+                            if (res.code == 0) {
+                                if (!res.codeMsg)
+                                    $.messager.alert('提示','删除成功',null,function(){ location.reload()});
+                            } 
+                        }
+                    })
+            }); 
+            ">删除</button>
+    </div>
+    
+
+</body>
+<script>
+   
+</script>
+</html>

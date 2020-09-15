@@ -237,64 +237,7 @@ var config = null;
                         item.phone=newValue
                     }" style="width:200px"></td>
             </tr>
-            <tr>
-                <td>真实姓名&nbsp;</td>
-                <td><input id="realname" class="easyui-textbox" style="width:100%" data-options="
-                    value:item.realname,
-                    iconWidth:20,
-                    icons:[{
-                        iconCls:'icon-clear',
-                        handler: function(e){
-                            debugger
-                            $(e.data.target).textbox('setValue','');
-                        }
-                    }],
-                    onChange:function(newValue, oldValue){
-                        item.realname=newValue
-                    }" style="width:200px"></td>
-            </tr>
-            <tr>
-                <td>身份证&nbsp;</td>
-                <td>
-                    <div id="idCard">
-                        <img style="display:none;" src="./favicon.ico" onload="$('#idCard-value').attr('src',item.idCard).parent().viewer({url: 'src',});if(item.idCard) $('#idCard-value').show();" />
-                        <img id="idCard-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","./image/image-error.png");' />
-                        <input type="file" style="display:none;" onchange="
-                            javascript:
-                            var target = this;
-                            if(this.files.length>0){
-                                var file = this.files[0];
-                                var fd = new FormData()
-                                fd.append('file', file);
-                                $.ajax({
-                                    url: '/wuliu/upload-file',
-                                    type: 'POST',
-                                    data: fd,
-                                    cache: false,
-                                    processData: false,
-                                    contentType: false,
-                                    async: true,
-                                    success: function (res) {
-                                        if (res.codeMsg)
-                                            $.messager.alert('提示',res.codeMsg)
-                                        if (res.code == 0) {
-                                            item.idCard=res.data.url 
-                                            $(target).prev().attr('src',item.idCard).show()
-                                         target.value=null
-                                        }
-                                    }
-                                })
-                            }
-                        " />
-                        <a title="删除" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" plain="true"
-                            style="vertical-align: text-bottom;"
-                            onclick="$(this).prev().prev().attr('src',null).hide();item.idCard='';"></a>
-
-                        <a title="选择" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-choose" plain="true"
-                            style="vertical-align: text-bottom;" onclick="$(this).prev().prev().click()"></a>
-                    </div>
-                </td>
-            </tr>
+            
             <tr>
             </tr>
             <tr>
@@ -1181,7 +1124,7 @@ var config = null;
                     "></td>
             </tr>
 
-
+            <tr></tr>
              <tr>
                 <td>认证&nbsp;</td>
                 <td>
@@ -1194,18 +1137,18 @@ var config = null;
                 </td>
             </tr>
             <tr>
-                <td>认证类型&nbsp;</td>
+                <td>类型&nbsp;</td>
                 <td><input id="renZhengType" class="easyui-combobox" style="width:100%" data-options="
                                 value:item.renZhengType,
                                 editable:false,panelHeight:'auto',
                                 data:[{
-                                    text: '个人',
+                                    text: '货主',
                                     value: '1'
                                 },{
                                      text: '公司',
                                      value: '2'
                                  },{
-                                    text: '贸易',
+                                    text: '工厂',
                                     value: '3'
                                 }],
                                  iconWidth:20,
@@ -1220,7 +1163,65 @@ var config = null;
                                  }" /></td>
             </tr>
             <tr>
-                <td>公司名&nbsp;</td>
+                <td>真实姓名&nbsp;</td>
+                <td><input id="realname" class="easyui-textbox" style="width:100%" data-options="
+                    value:item.realname,
+                    iconWidth:20,
+                    icons:[{
+                        iconCls:'icon-clear',
+                        handler: function(e){
+                            debugger
+                            $(e.data.target).textbox('setValue','');
+                        }
+                    }],
+                    onChange:function(newValue, oldValue){
+                        item.realname=newValue
+                    }" style="width:200px"></td>
+            </tr>
+            <tr>
+                <td>身份证&nbsp;</td>
+                <td>
+                    <div id="idCard">
+                        <img style="display:none;" src="./favicon.ico" onload="$('#idCard-value').attr('src',item.idCard).parent().viewer({url: 'src',});if(item.idCard) $('#idCard-value').show();" />
+                        <img id="idCard-value" style="width:30px;height:30px;object-fit:contain;cursor:pointer;vertical-align: baseline;display:none;" onerror='debugger;$(this).attr("src","./image/image-error.png");' />
+                        <input type="file" style="display:none;" onchange="
+                            javascript:
+                            var target = this;
+                            if(this.files.length>0){
+                                var file = this.files[0];
+                                var fd = new FormData()
+                                fd.append('file', file);
+                                $.ajax({
+                                    url: '/wuliu/upload-file',
+                                    type: 'POST',
+                                    data: fd,
+                                    cache: false,
+                                    processData: false,
+                                    contentType: false,
+                                    async: true,
+                                    success: function (res) {
+                                        if (res.codeMsg)
+                                            $.messager.alert('提示',res.codeMsg)
+                                        if (res.code == 0) {
+                                            item.idCard=res.data.url 
+                                            $(target).prev().attr('src',item.idCard).show()
+                                         target.value=null
+                                        }
+                                    }
+                                })
+                            }
+                        " />
+                        <a title="删除" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-clear" plain="true"
+                            style="vertical-align: text-bottom;"
+                            onclick="$(this).prev().prev().attr('src',null).hide();item.idCard='';"></a>
+
+                        <a title="选择" href="JavaScript:void(0)" class="easyui-linkbutton" iconCls="icon-choose" plain="true"
+                            style="vertical-align: text-bottom;" onclick="$(this).prev().prev().click()"></a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>公司&nbsp;</td>
                 <td><input id="company" class="easyui-textbox" style="width:100%" data-options="
                     value:item.company,
                     iconWidth:20,
@@ -1277,6 +1278,7 @@ var config = null;
                     </div>
                 </td>
             </tr>
+            <tr></tr>
            <tr>
                 <td>服务商认证&nbsp;</td>
                 <td>
@@ -1296,7 +1298,8 @@ var config = null;
                         onChange:function(newValue, oldValue){
                             item.fuWuShangIntro=newValue
                         }" style="width:200px"></td>
-            </tr> 
+            </tr>
+            <tr></tr>
             <tr>
                 <td>冻结&nbsp;</td>
                 <td>

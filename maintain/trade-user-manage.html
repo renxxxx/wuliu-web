@@ -109,7 +109,7 @@
                 frozenColumns: [[
                     { field: 'ck', align: 'left', checkbox: true },
                     {
-                        field: 'nickname', title: '昵称', width: 150, align: 'left', halign: 'center', formatter: function (value, row, index) {
+                        field: 'nickname', title: '昵称', width: 250, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
                                         onclick="project.newTab({title:'用户:${value.substring(0, 10) + '...'}',url:'./user-info.html?userId=${row.userId}'})"
                                     >${value || ''}
