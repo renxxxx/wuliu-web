@@ -158,6 +158,7 @@ var config = null;
                                         })
                                     }else{
                                         layer.msg('无修改');
+                                        $('#faHuoAddressEditPad').hide()
                                     }
                                 }
                             }); 
@@ -166,11 +167,16 @@ var config = null;
                     </button>
                     <button style="font-size:18px;margin-left:20px;cursor: pointer;"
                         onclick="
-                             $.messager.confirm('提示','未保存的内容将会丢失, 确认取消吗?', function(r){
-                                if(r){
-                                    $('#faHuoAddressEditPad').hide()
-                                }
-                            }); 
+                            var newName = $('#faHuoAddressEditPad .value').val()
+                            if(item.name != newName){
+                                $.messager.confirm('提示','值已被修改, 确认取消吗?', function(r){
+                                    if(r){
+                                        $('#faHuoAddressEditPad').hide()
+                                    }
+                                }); 
+                            }else{
+                                $('#faHuoAddressEditPad').hide()
+                            }
                         ">
                         取消
                     </button>

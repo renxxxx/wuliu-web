@@ -42,9 +42,9 @@ project.baoZhuangFangShi = function (value) {
     if(isNaN(value) || value ==null)
         return ''
     if(value == 1)
-        return '木箱'
+        return '有托盘'
     else if(value == 2)
-        return '纸箱'
+        return '无托盘'
    return ''
 }
 

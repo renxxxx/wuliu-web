@@ -104,8 +104,12 @@
            {
                 id:"user-manage",
                 text:"用户管理",
-                url:'./user-manage.html',
                 children:[
+                    {
+                        id:"user-manage",
+                        text:"全部",
+                        url:'./user-manage.html',
+                    },
                     {
                         id:"person-user-manage",
                         text:"个人",
@@ -134,8 +138,18 @@
                 url:'./article-manage.html',
             },{
                 id:"goods-manage",
-                text:"大货管理",
-                url:'./goods-manage.html',
+                text:"货物管理",
+                children:[
+                    {
+                        id:"goods-manage",
+                        text:"货物",
+                        url:'./goods-manage.html'
+                    },{
+                        id:"goods-type-manage",
+                        text:"类型",
+                        url:'./goods-type-manage.html?upperId=0'
+                    }
+                ]
             },{
                 id:"config-manage",
                 text:"参数配置",
@@ -151,9 +165,8 @@
                 location.href='./login.html'
                 return;
             }
-
-            project.newTab({id:node.id,title:node.text,url:node.url})
-           
+            if(node.url)
+                project.newTab({id:node.id,title:node.text,url:node.url})
         }
     });
   
