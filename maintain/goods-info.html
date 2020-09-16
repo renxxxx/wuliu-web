@@ -155,12 +155,6 @@ function updateConfirm(){
                 }
             })
 
-            var selected1Option = $('#type1 option:selected');
-            item.type1Id=selected1Option.val()
-            item.type1Name=selected1Option.text()
-            var selected2Option = $('#type2 option:selected');
-            item.type2Id=selected2Option.val()
-            item.type2Name=selected2Option.text()
 
             $.ajax({
                             type: 'post',
@@ -487,6 +481,107 @@ function remove(){
                         }" style="width:200px"></td>
                 </tr>
                 <tr>
+                    <td>类型</td>
+                    <td><input id="typeId" class="easyui-combobox" style="width:130px;" data-options="
+                        value:item.typeId,
+                        text:item.typeName,
+                        valueField:'goodsTypeId',
+                        textField:'name',
+                        mode:'remote',
+                        onShowPanel:function(){
+                            $(this).combobox('reload')
+                        },
+                        loader: function (param, success, error) {
+                            debugger
+                            $.ajax({
+                                url: '/wuliu/maintain/goods-type/items?upperId=0',
+                                type: 'get',
+                                data: {},
+                                success: function (data) {
+                                    debugger
+                                    success({rows:data.data.items});
+                                }
+                            })
+                        },
+                        onChange:function(newValue, oldValue){
+                            debugger
+                            item.typeId=newValue
+                            item.typeName= $('#typeId').combobox('getText')
+    
+                            item.type1Id=null;
+                            item.type1Name=null;
+                            $('#type1Id').combobox('setText',null)
+                            $('#type1Id').combobox('setValue',null)
+                        },
+                        loadFilter: function (data) {
+                            debugger
+                            return data.rows;
+                        },
+                        iconWidth:20,
+                        icons:[{
+                            iconCls:'icon-clear',
+                            handler: function(e){
+                                $(e.data.target).combobox('setValue','');
+                                item.typeId=null;
+                                item.typeName=null;
+                                $('#typeId').combobox('setText',null)
+                                $('#typeId').combobox('setValue',null)
+    
+                                item.type1Id=null;
+                                item.type1Name=null;
+                                $('#type1Id').combobox('setText',null)
+                                $('#type1Id').combobox('setValue',null)
+    
+                            }
+                        }]
+                        ">
+                        <input id="type1Id" class="easyui-combobox" style="width:130px;" data-options="
+                        value:item.type1Id,
+                        text:item.type1Name,
+                        valueField:'goodsTypeId',
+                        textField:'name',
+                        mode:'remote',
+                        onShowPanel:function(){
+                            $(this).combobox('reload')
+                        },
+    
+                        loader: function (param, success, error) {
+                            debugger
+                            if(!item.typeId)
+                                return;
+                            $.ajax({
+                                url: '/wuliu/maintain/goods-type/items?upperId='+item.typeId,
+                                type: 'get',
+                                data: {},
+                                success: function (data) {
+                                    debugger
+                                    success({rows:data.data.items});
+                                }
+                            })
+                        },
+                        onChange:function(newValue, oldValue){
+                            debugger
+                            item.type1Id=newValue
+                            item.type1Name= $('#type1Id').combobox('getText')
+                        },
+                        loadFilter: function (data) {
+                            debugger
+                            return data.rows;
+                        },
+                        iconWidth:20,
+                        icons:[{
+                            iconCls:'icon-clear',
+                            handler: function(e){
+                                $(e.data.target).combobox('setValue','');
+                                item.type1Id=null;
+                                item.type1Name=null;
+                                $('#type1Id').combobox('setText',null)
+                                $('#type1Id').combobox('setValue',null)
+                            }
+                        }]
+                        ">
+                </tr>
+                <!-- <tr>
                     <td>类型&nbsp;</td>
                     <td>
                         <select id="type1" style="vertical-align: top;cursor:pointer;font-size:16px;height: 24px;" 
@@ -541,7 +636,7 @@ function remove(){
 
                         </select>
                     </td>
-                </tr>
+                </tr> -->
                 <tr></tr>
                 <tr>
                     <td>斤单价(元)&nbsp;</td>
