@@ -85,7 +85,7 @@
                     {
                         field: 'title', title: '文章标题', width: 350, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
-                                        onclick="project.newTab({title:'文章信息:${value.substring(0, 10) + '...'}',url:'./article-info.html?articleId=${row.articleId}'})"
+                                        onclick="project.newTab({title:'文章详情:${value.substring(0, 10) + '...'}',url:'./article-info.html?articleId=${row.articleId}'})"
                                     >${value}
                                     </a>`;
                         }, styler: function (value, row, index) {

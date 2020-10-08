@@ -34,15 +34,34 @@ util.queryStringObject = function(queryString) {
 }
 
 util.attr=function(obj,keyChain){
+    debugger
     if(!obj || !keyChain)
       return null;
      var keys= keyChain.split('.')
      var obj1 = obj;
      for(var i in keys){
-          obj1=obj1[keys[i]];
-          if(obj1==null || obj1==undefined)
-              return null
+         if(keys[i].indexOf('[')>=0){
+            var key=keys[i].substring(0,keys[i].indexOf('['));
+            var index = keys[i].substring(keys[i].indexOf('[')+1,keys[i].indexOf(']'));
+            obj1=obj1[key];
+            if(obj1==null || obj1==undefined)
+                return null
+            if(obj1.length<=index)
+                return null
+            obj1=obj1[index];
+         }else {
+            obj1=obj1[keys[i]];
+            if(obj1==null || obj1==undefined)
+                return null
+         }
      }
      return obj1;
+}
+
+util.trim=function(value){
+    debugger
+    if(!value)
+        return '';
+    return value.trim();
 }
 

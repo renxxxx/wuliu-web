@@ -99,7 +99,7 @@
                     {
                         field: 'name', title: '货物名称', width: 350, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
-                                        onclick="project.newTab({title:'大货信息:${value.substring(0, 10) + '...'}',url:'./goods-info.html?goodsId=${row.goodsId}'})"
+                                        onclick="project.newTab({title:'大货详情:${value.substring(0, 10) + '...'}',url:'./goods-info.html?goodsId=${row.goodsId}'})"
                                     >${value}
                                     </a>`;
                         }, styler: function (value, row, index) {

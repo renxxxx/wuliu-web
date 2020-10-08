@@ -97,7 +97,7 @@
                     {
                         field: 'orderId', title: '订单Id', width: 300, align: 'left', halign: 'center', formatter: function (value, row, index) {
                             return `<a href="JavaScript:void(0)" style="width:100%;display:inline-block;" title="${value || ''}" 
-                                        onclick="project.newTab({title:'订单信息:${'...'+ value.split("").reverse().join("").substring(0, 6).split("").reverse().join("")}',url:'./order-info.html?orderId=${row.orderId}'})"
+                                        onclick="project.newTab({title:'订单详情:${'...'+ value.split("").reverse().join("").substring(0, 6).split("").reverse().join("")}',url:'./order-info.html?orderId=${row.orderId}'})"
                                     >${value}
                                     </a>`;
                         }, styler: function (value, row, index) {

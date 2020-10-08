@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>集贤装-运维-订单信息</title>
+    <title>集贤装-运维-订单详情</title>
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
     <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
@@ -138,7 +138,7 @@ var config = null;
                 <td>用户&nbsp;</td>
                 <td>
                     <span style="margin-left:5px;"><a id="user" href="javascript:void(0);" onclick="
-                         project.newTab({title:'用户信息:'+item.userNickname.substring(0, 10) + '...',url:'./user-info.html?userId='+item.userId})   
+                         project.newTab({title:'用户详情:'+item.userNickname.substring(0, 10) + '...',url:'./user-info.html?userId='+item.userId})   
                         "></a></span>
                     <img src="./favicon.ico" onload="$('#user').text([item.userNickname,item.userPhone].join().replace(/,/g,' / ') ||'')"  style="display:none;"/>
                 </td>
