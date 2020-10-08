@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>集贤装-运维-大货订单详情</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./jquery-easyui/themes/icon.css">
+    <script type="text/javascript" src="./jquery-easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="./jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+    <link rel="stylesheet" href="./layui-v2.5.6/css/layui.css"  media="all">
+    <script src="./layui-v2.5.6/layui.js" charset="utf-8"></script>
+    <style></style>
+</head>
+
+<script>
+    var layer = layui.use('layer',function(){
+        console.log('layer.ready');
+    })
+
+    $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        $('#doing').show();
+    });
+    $.ajaxSetup({
+        complete:function(){
+            $('#doing').hide();
+        },
+        error:function(xhr){
+            
+        }
+    })
+
+    var qso = util.queryStringObject();
+    qso.orderId;
+    var item = {}
+
+    $.ajax({
+        type: 'get',
+        url: `/wuliu/maintain/goods-order/order-info?orderId=${qso.orderId}`,
+        async: false,
+        success: function (data) {
+            debugger
+            if (data.codeMsg)
+                alert(data.codeMsg);
+            if (data.code == 0) {
+                item = data.data;
+            }
+        }
+    })
+
+    $(document).ready(function(){
+        console.log('document.ready');
+    })
+
+  
+             
+        
+</script>
+
+<body style="margin:0;padding:0;font-size:0px;">
+    <div id="doing" style="height:5px;position: absolute;top:0;z-index: 999999;display:none;left:0;right:0;height:5px;">
+        <img src="./image/doing.gif" style="width:100%;height: 100%;vertical-align: top;" />
+    </div>
+    <div style="font-size:16px;font-weight: 900;padding:5px 3px;border-bottom:1px solid #e6e6e6;min-width:1000px;background-color: #ccc9c9;">订单详情</div>
+    <div id="orderIdPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            订单Id</span>
+        <span id="orderId" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#orderId').text(item.orderId||'')" style="display:none;"/>
+    </div>
+    <div id="userPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            用户
+        </span>
+        <span style="display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+            <a id="user" href="javascript:void(0);" style="font-size:16px;"
+                onclick="
+                    project.newTab({title:'用户详情: '+item.userNickname.substring(0, 10) + '...',url:'./user-info.html?userId='+item.userId})">
+            </a>
+        </span>
+        <img src="./favicon.ico" onload="$('#user').text([item.userNickname,item.userPhone].join().replace(/,/g,' / '))" style="display:none;"/>
+    </div>
+    <div id="moneyPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            金额</span>
+        <span id="money" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+        </span>
+        <img src="./favicon.ico" onload="$('#money').text(item.money||'')" style="display:none;"/>
+    </div>
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="faHuoAreaPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span  
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            区域</span>
+        <span id="faHuoArea" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#faHuoArea').text([item.area1Name,item.area2Name,item.area3Name].join().replace(/,/g,' / '))" style="display:none;"/>
+    </div>
+    <div id="addressPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            详细地址</span>
+        <span id="address" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#address').text(item.address)" style="display:none;"/>
+        <span style="cursor: pointer;font-size:14px;color: #616060;margin-left: 10px;"
+            onclick="
+                $('#addressEditPad').show();
+                $('#addressEditPad .value').val(item.address);
+            " >
+            编辑
+        </span>
+        <div id="addressEditPad" style="position:absolute;top:0;bottom:0;left:0;right:0;background-color: rgba(0,0,0,0.6);display:none;overflow:auto;">
+            <div style="width:80%;min-width:1000px;background-color: #FFFFFF;margin:auto;margin-top:50px;border:1px solid #ffffff;">
+                <div style="font-size: 16px;margin-top:10px;margin-left:5px;font-weight: 900;">修改详细地址</div>
+                <input class="value" type="text" style="width:500px;margin-left:5px;height:30px;font-size:16px;padding: 3px 3px;margin-top:10px;"/>
+                <div style="margin-top:10px;margin-left:5px;margin-bottom:10px;">
+                    <button style="font-size:18px;cursor: pointer;"
+                        onclick="
+                            $.messager.confirm('提示','确认修改吗？', function(r){
+                                if(r){
+                                    var newAddress = $('#addressEditPad .value').val()
+                                    if(item.address != newAddress){
+                                        $.ajax({
+                                            type: 'post',
+                                            url: '/wuliu/maintain/goods-order/update-order',
+                                            data: {orderId:item.orderId,address:newAddress},
+                                            success: function (res) {
+                                                debugger
+                                                if (res.codeMsg)
+                                                    $.messager.alert('提示',res.codeMsg);
+                                                if (res.code == 0) {
+                                                    if (!res.codeMsg)
+                                                        $.messager.alert('提示','修改成功',null,function(){ 
+                                                            item.address=newAddress
+                                                            $('#addressEditPad').hide()
+                                                        });
+                                                } 
+                                            }
+                                        })
+                                    }else{
+                                        layer.msg('无修改');
+                                        $('#addressEditPad').hide()
+                                    }
+                                }
+                            }); 
+                        ">
+                        确认
+                    </button>
+                    <button style="font-size:18px;margin-left:20px;cursor: pointer;"
+                        onclick="
+                            var newAddress = $('#addressEditPad .value').val()
+                            if(item.address != newAddress){
+                                $.messager.confirm('提示','你的修改将会丢失, 确认取消吗?', function(r){
+                                    if(r){
+                                        $('#addressEditPad').hide()
+                                    }
+                                }); 
+                            }else{
+                                $('#addressEditPad').hide()
+                            }
+                        ">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="createTimePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;" >
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;">
+            创建时间</span>
+        <span id="createTime" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;"></span>
+        <img src="./favicon.ico" onload="$('#createTime').text(moment(item.createTime).format('YY-MM-DD HH:mm'))" style="display:none;"/> 
+    </div>
+    <div style="height:10px;background-color: #e6e6e6;"></div>
+    <div id="detailNamePad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            货物</span>
+        <span style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+            <a id="detailName" href="javascript:void(0);" style="font-size:16px;"
+                onclick="
+                    project.newTab({title:'大货详情: '+util.trim(util.attr(item,'details[0].name')).substring(0, 10) + '...',url:'./goods-info.html?goodsId='+util.attr(item,'details[0].goodsId')})">
+            </a>
+        </span>
+        <img src="./favicon.ico" onload="$('#detailName').text(item.details[0].name||'')" style="display:none;"/>
+    </div>
+    <div id="jinBuyCountPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            数量(斤)</span>
+        <span id="jinBuyCount" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+        </span>
+        <img src="./favicon.ico" onload="$('#jinBuyCount').text(item.details[0].jinBuyCount||'')" style="display:none;"/>
+    <div id="jianBuyCountPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            数量(件)</span>
+        <span id="jianBuyCount" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+        </span>
+        <img src="./favicon.ico" onload="$('#jianBuyCount').text(item.details[0].jianBuyCount||'')" style="display:none;"/>
+    </div>
+    <div id="xiaoGuiBuyCountPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            数量(小柜)</span>
+        <span id="xiaoGuiBuyCount" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+        </span>
+        <img src="./favicon.ico" onload="$('#xiaoGuiBuyCount').text(item.details[0].xiaoGuiBuyCount||'')" style="display:none;"/>
+    </div>
+    <div id="daGuiBuyCountPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            数量(大柜)</span>
+        <span id="daGuiBuyCount" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+        </span>
+        <img src="./favicon.ico" onload="$('#daGuiBuyCount').text(item.details[0].daGuiBuyCount||'')" style="display:none;"/>
+    </div>
+    <div id="diyGuiBuyCountPad" style="border-bottom:1px solid #e6e6e6;min-width:1000px;">
+        <span 
+            style="
+                font-size:16px;display: inline-block;padding:3px 3px;width:150px;vertical-align: top;
+                border-right:1px solid #e6e6e6;word-break:break-all;
+            ">
+            数量(xx柜)</span>
+        <span id="diyGuiBuyCount" style="font-size:16px;display: inline-block;padding:3px 3px;width:500px;word-break:break-all;border-left: 1px solid #e6e6e6;margin-left:-1px;">
+        </span>
+        <img src="./favicon.ico" onload="$('#diyGuiBuyCount').text(item.details[0].diyGuiBuyCount||'')" style="display:none;"/>
+    </div>
+    <div id="operate" style="background-color: #e6e6e6;min-width:1000px;" >
+        <button style="cursor: pointer;margin:10px 0 10px 3px;font-size:20px;padding:1px 6px;" onclick="location.reload()">刷新</button>
+        <button style="cursor: pointer;margin:10px 0 10px 15px;font-size:20px;padding:1px 6px;" 
+            onclick="
+                $.messager.confirm('提示','确认删除吗？', function(r){
+                if(r)
+                $.ajax({
+                    type: 'post',
+                    url: '/wuliu/maintain/goods-order/delete-order',
+                    data: {orderId:item.orderId},
+                    success: function (res) {
+                        debugger
+                        if (res.codeMsg)
+                            $.messager.alert('提示',res.codeMsg);
+                        if (res.code == 0) {
+                            if (!res.codeMsg)
+                                $.messager.alert('提示','删除成功',null,function(){ location.reload()});
+                        } 
+                    }
+                })
+            }); 
+            ">删除</button>
+    </div>
+    
+
+</body>
+<script>
+   
+</script>
+</html>

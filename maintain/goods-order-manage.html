@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>集贤装-运维-类型详情</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <script src="https://lib.sinaapp.com/js/jquery/1.9.0/jquery.min.js"></script>
+    <script type="text/javascript" src="./jquery-viewer/js/viewer.min.js"></script>
+    <link rel="stylesheet" href="./jquery-viewer/css/viewer.min.css">
+    <script src="./jquery-viewer/js/viewer-jquery.min.js"></script>
+    <script src="./js/util.js"></script>
+    <script src="./js/project.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <script src="./js/moment.js"></script>
+    <link rel="stylesheet" href="./layui-v2.5.6/css/layui.css"  media="all">
+    <script src="./layui-v2.5.6/layui.js" charset="utf-8"></script>
+</head>
+<style>
+
+</style>
+<body style="padding:0 10px;;margin:0;">
+  <div id="doing" style="height:5px;position: absolute;top:0;z-index: 999999;display:none;left:0;right:0;height:5px;">
+    <img src="./image/doing.gif" style="width:100%;height: 100%;vertical-align: top;" />
+  </div>
+<div>
+  <button style="font-size:16px;cursor:pointer;padding:1px 6px;margin-top:10px;"
+    onclick="
+      layui.table.reload('test',{
+        page : { 
+          curr: 1, 
+          limit: 10
+        }, 
+        where: buildQuery()
+      })
+    ">
+    查询
+  </button>
+  <button style="font-size:16px;cursor:pointer;padding:1px 6px;margin-top:10px;"
+    onclick="
+      $('#query-kw').val('')
+      layui.table.reload('test',{
+        page : { 
+          curr: 1, 
+          limit: 10
+        }, 
+        where: buildQuery()
+      })
+    ">
+    重置
+  </button>
+</div>
+<div style="display:inline-block;width:230px;margin-top:10px;margin-bottom:10px;">
+  <span style="display:inline-block;width:60px;font-size:16px;vertical-align: baseline;line-height: 16px;">关键字 : </span>
+  <input id="query-kw" style="width:160px;vertical-align: baseline;line-height: 20px;"/>
+</div>
+<div>
+  <div>
+    <span>汇总 : </span>
+    <span>数量 - </span><span id="sum-count"></span>
+    <span>, 金额 - </span><span id="sum-money"></span>
+  </div>
+  <div>
+    <span>已选 : </span>
+    <span>数量 - </span><span id="selected-count"></span>
+    <span>, 金额 - </span><span id="selected-money"></span>
+  </div>
+</div>
+
+<table class="layui-hide" id="test" lay-filter="test" style='margin:0;'></table>
+
+<script type="text/html" id="toolbarDemo">
+</script>
+ 
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+              
+<script>
+  $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+    $('#doing').show();
+  });
+  $.ajaxSetup({
+    complete:function(){
+      $('#doing').hide();
+    },
+    error:function(xhr){
+        
+    }
+  })
+    function selectedSum(){
+      var table = layui.table;
+      var checkStatus = table.checkStatus('test'); //idTest 即为基础参数 id 对应的值
+      var selectedMoney=0;
+      if(checkStatus.data.length>0){
+        for (let i = 0; i < checkStatus.data.length; i++) {
+          const item = checkStatus.data[i];
+          selectedMoney+=item.money;
+        }
+      }
+      $('#selected-count').text(checkStatus.data.length||'')
+      $('#selected-money').text(selectedMoney||'')
+    }
+
+    function buildQuery(){
+      return {
+        kw: $('#query-kw').val()
+      }
+    }
+
+    function goOrderInfo(orderId){
+      project.newTab({title:`订单详情: ...${orderId.split("").reverse().join("").substring(0, 6).split("").reverse().join("")}`,url:`./goods-order-info.html?orderId=${orderId}`})
+    }
+
+    layui.use('table', function(){
+    var table = layui.table;
+ 
+    table.render({
+        elem: '#test',
+        url:'/wuliu/maintain/goods-order/orders',
+        toolbar: '#toolbarDemo',
+        defaultToolbar: ['filter', 'exports', 'print'],
+        title: '大货订单表',
+        autoSort: false,
+        height:540,
+        limit: 10,
+        limits: [10,30,50,100],
+        where: buildQuery(),
+        request: {
+            pageName: 'pn',
+            limitName: 'ps'
+        },
+        parseData: function(data){
+            debugger
+            if (data.codeMsg)
+                layer.alert(data.codeMsg);
+            if (data.code != 0)
+                return;
+            var sum;
+            $.ajax({
+                url: '/wuliu/maintain/goods-order/orders-sum',
+                data: buildQuery(),
+                method: 'get',
+                async: false,
+                success: function(data){
+                    sum = data.data;
+                    $('#sum-count').text(sum.count||'')
+                    $('#sum-money').text(sum.money||'')
+                }
+            })
+            return {
+                "code": data.code, 
+                "msg": data.codeMsg, 
+                "count": sum.count, 
+                "data": data.data.items
+            };
+        },
+        title: '大货订单表',
+        cols: [[
+            {type: 'checkbox', fixed: 'left'},
+            {field:'orderId', title:'ID', width:150, fixed: 'left', templet: function(data){
+              return '<a href=\'#\' style=\'\' onclick=goOrderInfo(\''+data.orderId+'\')>'+ data.orderId.substr(17) +'</a>'
+            }},
+            {field:'userNickname', title:'昵称', width:120},
+            {field:'userPhone', title:'手机', width:150},
+            {field:'money', title:'金额', width:150},
+            {field:'area', title:'地区', width:200, templet: function(data){
+              return [data.area1Name,data.area2Name,data.area3Name].join(' / ');
+            }},
+            {field:'detail', title:'商品', width:200, templet: function(data){
+              return (data.details && data.details.length > 0 )? data.details[0].name : '';
+            }},
+            {field:'createTime', title:'创建时间', width:130, sort: true, templet: function(data){
+              return moment(data.createTime).format('YY-MM-DD HH:mm');
+            }},
+            {fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+        ]],
+        page: true,
+        done: function(res, curr, count){
+          selectedSum();
+        }
+    });
+  
+    table.on('sort(test)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+        debugger
+        if(!obj.type)
+          obj.field = null;
+        //尽管我们的 table 自带排序功能，但并没有请求服务端。
+        //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
+        table.reload('test', { //testTable是表格容器id
+           where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）
+                sort: obj.field, //排序字段
+                order: obj.type //排序方式
+            }
+        });
+    });
+    
+  //头工具栏事件
+  table.on('toolbar(test)', function(obj){
+    var checkStatus = table.checkStatus(obj.config.id);
+    switch(obj.event){
+    };
+  });
+  
+  table.on('checkbox(test)', function(obj){
+    selectedSum()
+  });
+
+  //监听行工具事件
+  table.on('tool(test)', function(obj){
+    var data = obj.data;
+    //console.log(obj)
+    if(obj.event === 'del'){
+      layer.confirm('真的删除吗? <br/>  请核对: '+data.orderId.substr(17), function(index){
+        $.ajax({
+          url: '/wuliu/maintain/goods-order/delete-order',
+          method: 'post',
+          data: {orderId: data.orderId},
+          success: function(data){
+            if(data.code == 0) {
+              if(data.codeMsg)
+                layer.alert(data.codeMsg);
+              else {
+                layer.alert('删除成功');
+              }
+              obj.del();
+              layer.close(index);
+            } else {
+              if(data.codeMsg)
+                layer.alert(data.codeMsg);
+            }
+          }
+        })
+       
+      });
+    } else if(obj.event === 'edit'){
+      layer.prompt({
+        formType: 2
+        ,value: data.email
+      }, function(value, index){
+        obj.update({
+          email: value
+        });
+        layer.close(index);
+      });
+    }
+  });
+});
+
+
+</script>
+
+</body>
+</html>
